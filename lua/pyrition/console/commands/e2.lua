@@ -2,14 +2,13 @@ local custom_default_code
 local editor_control_table
 local template_load
 
+--sources
 --local functions
 local function global_panel_update(class, updater)
+	--runs the function provided on the panel's table and all panels active under the world panel 
 	updater(false, editor_control_table)
 	
-	for index, panel in ipairs(vgui.GetWorldPanel():GetChildren()) do
-		if panel:GetName() == class then updater(true, panel)
-		else print("failed on", panel:GetName()) end
-	end
+	for index, panel in ipairs(vgui.GetWorldPanel():GetChildren()) do if panel:GetName() == class then updater(true, panel) end end
 end
 
 local function template_disable(self)
@@ -21,10 +20,12 @@ local function template_disable(self)
 	end)
 end
 
-local function template_enable()
-	--backup the function
+local function template_enable(self)
+	--we can't do the same with shutdown save ;-;
+	--its too hard to expose
 	local function auto_save(self, ...)
-		--if 
+		--don't save default code dingus
+		if self:GetCode() == custom_default_code then return end
 		
 		self:AutoSaveX(...)
 	end
@@ -60,8 +61,6 @@ local function template_enable()
 		if not panel.AutoSaveX then panel.AutoSaveX = panel.AutoSave end
 		if not panel.NewScriptX then panel.NewScriptX = panel.NewScript end
 		
-		print("updated", panel)
-		
 		panel.NewScript = new_script
 	end)
 end
@@ -72,6 +71,7 @@ local function template_path() end
 
 --command structure
 COMMAND.Description = "All commands related to Expression 2."
+COMMAND.Realm = PYRITION_CLIENT
 
 COMMAND.Tree = {
 	--branch table
@@ -88,6 +88,11 @@ COMMAND.Tree = {
 				end,
 				
 				{Description = "Set the file path relative to data/expression2/ for the template used by new scripts."}
+			},
+			
+			reload = {
+				template_load,
+				{Description = "Reload the template file."}
 			}
 		}
 	}
@@ -96,9 +101,7 @@ COMMAND.Tree = {
 function COMMAND:Initialize()
 	editor_control_table = vgui.GetControlTable("Expression2EditorFrame")
 	
-	if editor_control_table then
-		template_enable()
-	end
+	if editor_control_table then template_enable() end
 	
 	return editor_control_table and true or false
 end

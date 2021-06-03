@@ -18,6 +18,11 @@ local config = {
 		shared = 15,	--01 111
 		server = 18		--10 010
 	},
+	
+	language = {
+		client = 5,	--0 101
+		server = 2		--0 010
+	}
 }
 
 --what do we say we are when we load up?

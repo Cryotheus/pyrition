@@ -39,5 +39,7 @@ function PYRITION:PyritionCommandComplete(command, arguments)
 	return self:PyritionLanguageFormat("pyrition.insult.autocomplete")
 end
 
+function PYRITION:PyritionCommandInitialized(command) return bit.band(command.Realm, PYRITION_CLIENT) > 0 end
+
 --commands
 concommand.Add("pyrition", function(...) hook.Call("PyritionCommandRun", PYRITION, ...) end, function(...) hook.Call("PyritionCommandComplete", PYRITION, ...) end, PYRITION:PyritionLanguageFormat("pyrition.command.help"))
