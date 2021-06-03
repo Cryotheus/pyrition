@@ -1,2 +1,2 @@
-# pyrition
-Command system for Garry's Mod
+# Pyrition
+Command system for Garry's Mod.
