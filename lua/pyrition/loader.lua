@@ -4,24 +4,48 @@
 --status: active
 --motivation: pure rage and anger over the sanctuary sandbox server
 PYRITION = {
-	Commands = {}
+	Commands = {},
+	
+	GFX = PYRITION and PYRITION.GFX or {
+		BlipOutline = {},
+		Outline = {}
+	},
+	
+	MediaCommands = PYRITION and PYRITION.MediaCommands or {}
 }
 
-PYRITION_CLIENT = 1
-PYRITION_SERVER = 2
-PYRITION_SHARED = bit.band(PYRITION_CLIENT, PYRITION_SERVER)
+PYRITION_CLIENT = 1 --include on client, AddCSLua
+PYRITION_SERVER = 2 --include on server
+PYRITION_MEDIA = 4 --clients network when they run this command instead of executing it
+
+PYRITION_MEDIATED = bit.bor(PYRITION_SERVER, PYRITION_MEDIA)
+PYRITION_SHARED = bit.bor(PYRITION_CLIENT, PYRITION_SERVER)
+
+PYRITION_MAP_DIAGONAL = 113512 --113511.681725
 
 --config
 local config = {
+	client = 29,	--11 101
+	server = 26,	--11 010
+	
 	console = {
 		client = 21,	--10 101
 		shared = 15,	--01 111
 		server = 18		--10 010
 	},
 	
+	gfx = {
+		outline = 5,	--0 101
+		outline_blip = 5	--0 101
+	},
+	
 	language = {
 		client = 5,	--0 101
-		server = 2		--0 010
+		server = 2	--0 010
+	},
+	
+	players = {
+		discovery = 7	--0 111
 	}
 }
 

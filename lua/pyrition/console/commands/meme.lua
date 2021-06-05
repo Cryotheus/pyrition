@@ -1,3 +1,7 @@
+COMMAND.Realm = PYRITION_CLIENT
+
+if SERVER then return end
+
 local meme_active
 local meme_props = {}
 local meme_rate = 1
@@ -47,8 +51,10 @@ local meme_enjoyer_material_scrolls = {
 local function disable_meme()
 	meme_active = false
 	
-	hook.Remove("RenderScene", "pyrition_meme")
+	--remove all hooks identified by "pyrition_meme"
+	for event, hooks in pairs(hook.GetTable()) do if hooks.pyrition_meme then hook.Remove(event, "pyrition_meme") end end
 	
+	--remove all client side props 
 	for key, meme_prop in pairs(meme_props) do meme_prop:Remove() end
 end
 
@@ -76,16 +82,11 @@ surface.CreateFont("string fontName", {
 COMMAND.Description = "Post process effects for memes"
 
 COMMAND.Tree = {
-	show = {
+	disable = disable_meme,
+	
+	enable = {
 		enjoyer = {
-			{Description = "Average fan vs average enjoyer meme."},
-			
-			disable = function(self, arguments)
-				--uh oh
-				disable_meme()
-			end,
-			
-			enable = function(self, arguments)
+			function(self, arguments)
 				if meme_active then return self:Fail("A meme is already active.")
 				else
 					meme_active = true
@@ -188,29 +189,34 @@ COMMAND.Tree = {
 				end)
 			end,
 			
-			header = {
-				function(self, arguments) meme_enjoyer_header = math.Clamp(tonumber(arguments[1]) or meme_rate, 0, 1) end,
+			header = function(self, arguments) meme_enjoyer_header = math.Clamp(tonumber(arguments[1]) or meme_rate, 0, 1) end,
+			squeeze = function(self, arguments) meme_enjoyer_squeeze = math.Clamp(tonumber(arguments[1]) or meme_rate, 0.1, 1) end,
+		},
+		
+		stare = function(self, arguments)
+			hook.Add("PrePlayerDraw", "pyrition_meme", function(ply)
+				local bone_id = ply:LookupBone("ValveBiped.Bip01_Head1")
 				
-				{Description = "Percentage of the screen's height to use as the header's writing space. Keep in mind that has there is more header the image gets smaller as to maintain a 1:1 ratio."}
-			},
-			
-			squeeze = {
-				function(self, arguments) meme_enjoyer_squeeze = math.Clamp(tonumber(arguments[1]) or meme_rate, 0.1, 1) end,
-				
-				{Description = "Multiplier for the enjoyer meme's view port width. Range is 1 to 0.1 and keep in mind the view port can't have a negative x clip."}
-			}
-		}
+				if bone_id then
+					local bone_matrix = ply:GetBoneMatrix(bone_id)
+					
+					if bone_matrix then
+						local end_position = LocalPlayer():GetShootPos()
+						local start_position = bone_matrix:GetTranslation()
+						
+						local direction = (end_position - start_position):GetNormalized()
+						local direction_angles = select(2, LocalToWorld(vector_origin, Angle(-90, 90, 0), vector_origin, direction:Angle()))
+						
+						bone_matrix:SetAngles(direction_angles)
+						
+						ply:SetBoneMatrix(bone_id, bone_matrix)
+					end
+				end
+			end)
+		end
 	},
 	
-	rate = {
-		function(self, arguments) meme_rate = math.Clamp(tonumber(arguments[1]) or meme_rate, 0.1, 10) end,
-		
-		{Description = "Multiplier for meme animations."}
-	},
+	rate = function(self, arguments) meme_rate = math.Clamp(tonumber(arguments[1]) or meme_rate, 0.1, 10) end,
 	
-	text = {
-		function(self, arguments) meme_text = arguments end,
-		
-		{Description = "Text used by meme post process effects. Text may be overwritten when enabling a meme; run this after a meme has been enabled."}
-	}
+	text = function(self, arguments) meme_text = arguments end
 }

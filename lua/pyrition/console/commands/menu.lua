@@ -1,6 +1,7 @@
 COMMAND.Description = "Open a VGUI menu for Pyrition."
+COMMAND.Realm = PYRITION_CLIENT
 
-COMMAND.Tree = {
+COMMAND.Tree = {--self, ply, arguments, arguments_string
 	
 }
 

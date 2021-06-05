@@ -1,3 +1,7 @@
+COMMAND.Realm = PYRITION_CLIENT
+
+if SERVER then return false end
+
 local custom_default_code
 local editor_control_table
 local template_load
@@ -11,7 +15,7 @@ local function global_panel_update(class, updater)
 	for index, panel in ipairs(vgui.GetWorldPanel():GetChildren()) do if panel:GetName() == class then updater(true, panel) end end
 end
 
-local function template_disable(self)
+local function template_disable(self, ply, arguments, arguments_string)
 	global_panel_update("Expression2EditorFrame", function(is_panel, panel)
 		if editor_control_table.NewScriptX then
 			editor_control_table.NewScript = editor_control_table.NewScriptX
@@ -20,7 +24,7 @@ local function template_disable(self)
 	end)
 end
 
-local function template_enable(self)
+local function template_enable(self, ply, arguments, arguments_string)
 	--we can't do the same with shutdown save ;-;
 	--its too hard to expose
 	local function auto_save(self, ...)
@@ -65,35 +69,20 @@ local function template_enable(self)
 	end)
 end
 
-function template_load() custom_default_code = file.Read("expression2/_new_.txt", "DATA") end
+function template_load(self, ply, arguments, arguments_string) custom_default_code = file.Read("expression2/_new_.txt", "DATA") end
 
-local function template_path() end
+local function template_path(self, ply, arguments, arguments_string) end
 
 --command structure
-COMMAND.Description = "All commands related to Expression 2."
-COMMAND.Realm = PYRITION_CLIENT
-
 COMMAND.Tree = {
 	--branch table
 	editor = {
 		--branch function, called by running "pyrition e2 editor test"
 		template = {
-			{Description = "Commands for controlling the template used for new scripts in the editor."},
 			disable = template_disable,
 			enable = template_enable,
-			
-			path = {
-				function(self, arguments)
-					
-				end,
-				
-				{Description = "Set the file path relative to data/expression2/ for the template used by new scripts."}
-			},
-			
-			reload = {
-				template_load,
-				{Description = "Reload the template file."}
-			}
+			path = function(self, ply, arguments, arguments_string) end,
+			reload = template_load
 		}
 	}
 }

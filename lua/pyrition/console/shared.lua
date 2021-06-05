@@ -1,8 +1,8 @@
 local color_generic = Color(255, 255, 255)
-local color_significant = Color(255, 192, 0)
+local color_significant = Color(255, 191, 0)
 
 local command_defaults = {
-	Execute = function(self, arguments)
+	Execute = function(self, ply, arguments, arguments_string)
 		if arguments and not table.IsEmpty(arguments) then
 			local current = self.Tree
 			local local_arguments = table.Copy(arguments)
@@ -11,21 +11,22 @@ local command_defaults = {
 				local tree = current[branch]
 				
 				if istable(tree) then
+					arguments_string = string.sub(arguments_string, #branch + 2)
 					current = tree
 					
 					table.remove(local_arguments, 1)
 				elseif isfunction(tree) then
 					table.remove(local_arguments, 1)
 					
-					return tree(self, local_arguments)
+					return tree(self, ply, local_arguments, string.sub(arguments_string, #branch + 2))
 				else break end
 			end
 			
 			local root_function = current[1]
 			
-			if isfunction(root_function) then return root_function(self, local_arguments)
+			if isfunction(root_function) then return root_function(self, ply, local_arguments, arguments_string)
 			else self:Fail("End of command tree reached with no root function present.") end
-		else return self:ExecuteRoot(arguments, arguments_string) end
+		else return self:ExecuteRoot(ply, arguments, arguments_string) end
 	end,
 	
 	ExecuteRoot = function(self, ...)
@@ -35,11 +36,17 @@ local command_defaults = {
 		else self:Fail("No root command present.") end
 	end,
 	
-	Fail = function(self, message) print(message or "Unknown command.") end,
 	Initialize = function(self) return true end,
 	PostInitialize = function(self) return true end,
 	Success = function(self, message) print(message or "Success.") end
 }
+
+if SERVER then
+	command_defaults.Fail = function(self, ply, key, phrases)
+		if phrases then hook.Call("PyritionLanguageSendFormat", PYRITION, ply, HUD_PRINTCONSOLE, key, phrases)
+		else hook.Call("PyritionLanguageSendFormat", PYRITION, ply, HUD_PRINTCONSOLE, key) end
+	end
+else command_defaults.Fail = function(self, ply, key, phrases) hook.Call("PyritionLanguageMessage", PYRITION, ply, HUD_PRINTCONSOLE, key, phrases) end end
 
 --local functions
 local function count_functions(field, depth)
@@ -54,41 +61,51 @@ local function count_functions(field, depth)
 end
 
 --pyrition functions
-function PYRITION:PyritionCommandLoad(path)
+function PYRITION:PyritionConsoleLoadCommands(path)
 	--local files = file.Find("lua/" .. path .. "*.lua", "garrysmod")
 	local files = file.Find(path .. "*.lua", "LUA")
 	
+	PYRITION.Commands = {}
+	
 	for index, file_name in ipairs(files) do
 		local command = string.StripExtension(file_name)
+		local command_error = "worked?"
 		local command_tree = true
 		local file_path = path .. file_name
 		
 		COMMAND = table.Copy(command_defaults)
+		COMMAND.Command = command
 		COMMAND.ID = index
 		
-		include(file_path)
+		local valid_command = xpcall(function()
+			--anger!
+			include(file_path)
+		end, function() command_error = "error!" end)
 		
 		PYRITION.Commands[command] = COMMAND
 		
-		if COMMAND:Initialize() and hook.Call("PyritionCommandInitialized", self, COMMAND) then
-			if COMMAND.Tree then
-				local function_count = count_functions(COMMAND.Tree, 0)
-				COMMAND.TreeCommandCount = function_count
+		if valid_command then
+			if COMMAND:Initialize() and hook.Call("PyritionConsoleInitializeCommand", self, file_path, command, COMMAND) then
+				if COMMAND.Tree then
+					local function_count = count_functions(COMMAND.Tree, 0)
+					COMMAND.TreeCommandCount = function_count
+					
+					MsgC(color_generic, " ]        command " .. command .. " = " .. function_count .. "\n")
+				else MsgC(color_generic, " ]        command " .. command .. "\n") end
 				
-				MsgC(color_generic, " ]        command " .. command .. " = " .. function_count .. "\n")
-			else MsgC(color_generic, " ]        command " .. command .. "\n") end
-		else
-			PYRITION.Commands[command] = nil
-			PYRITION.CommandTree[command] = true
+				continue
+			end
 			
 			MsgC(color_generic, " ]        command " .. command .. " (skipped)\n")
-		end
+		else MsgC(color_generic, " ]        command " .. command .. " (erred: [" .. command_error .. "])\n") end
 		
-		COMMAND = nil
+		PYRITION.Commands[command] = nil
 	end
+	
+	COMMAND = nil
 end
 
-function PYRITION:PyritionCommandRun(ply, command, arguments, arguments_string)
+function PYRITION:PyritionConsoleRunCommand(ply, command, arguments, arguments_string)
 	arguments = arguments or {}
 	local argument_command = arguments[1]
 	
@@ -98,9 +115,11 @@ function PYRITION:PyritionCommandRun(ply, command, arguments, arguments_string)
 		if command_data then
 			table.remove(arguments, 1)
 			
-			command_data:Execute(arguments)
-		else print("No entry in command table found.") end
-	else
-		
-	end
+			if isbool(command_data) then hook.Call("PyritionConsoleRunMediatedCommand", PYRITION, ply, argument_command, arguments, string.sub(arguments_string, #argument_command + 2))
+			else command_data:Execute(ply, arguments, string.sub(arguments_string, #argument_command + 2)) end
+		else print("No entry in command table found.\n") end
+	else hook.Call("PyritionLanguageMessage", PYRITION, ply, 0, "pyrition.insults.unknown_command") end
 end
+
+--commands
+concommand.Add("pyrition_reload_commands", function() hook.Call("PyritionConsoleLoadCommands", PYRITION, "pyrition/console/commands/") end, nil, "Reload all Pyrition commands.")

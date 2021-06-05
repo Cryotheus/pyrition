@@ -1,5 +1,3 @@
-COMMAND.Description = "A simple 4 operation calculator, with added parenthesis, module, and exponent support."
-
 --local variables
 local color_algebra = Color(192, 192, 192)
 local color_solution = Color(224, 224, 224)
@@ -99,10 +97,12 @@ local function toggle(state)
 	else hook.Remove("OnPlayerChat", "chat_calculator") end
 end
 
---command
+--command structure
+COMMAND.Realm = PYRITION_CLIENT
+
 COMMAND.Tree = {
-	function(self, arguments)
-		local algebra = parse(table.concat(arguments, " "))
+	function(self, ply, arguments, arguments_string)
+		local algebra = parse(arguments_string)
 		
 		if unsolved then MsgC(color_algebra, "? " .. algebra .. "\n") end
 		
@@ -110,12 +110,8 @@ COMMAND.Tree = {
 	end,
 	
 	chat = {
-		{Description = "Make the calculator automatically solve expressions put in the chat that start with an equals sign. Does not work perfectly as some servers recreate their chat (???)"},
-		disable = function(self, arguments) toggle(false) end,
-		enable = function(self, arguments) toggle(true) end,
-		unsolved = {
-			function(self, arguments) end,
-			{Description = "Should the calculator show the unsolved expression before solving it?"}
-		}
+		disable = function(self, ply, arguments, arguments_string) toggle(false) end,
+		enable = function(self, ply, arguments, arguments_string) toggle(true) end,
+		unsolved = function(self, ply, arguments, arguments_string) end
 	}
 }
