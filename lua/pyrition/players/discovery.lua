@@ -110,7 +110,11 @@ function PYRITION:PyritionPlayerFindBySteamID(needle, supplicant)
 		for index, ply in ipairs(all_players) do
 			local steam_id = ply:SteamID()
 			
-			if string.sub(steam_id, 9) == needle or steam_id == needle then table.insert(players, ply) end
+			if string.sub(steam_id, 9) == needle or steam_id == needle then
+				print("needle: " .. needle .. ", steamid: " .. steam_id .. ", sub: " .. string.sub(steam_id, 9))
+				
+				table.insert(players, ply)
+			end
 		end
 		
 		if table.IsEmpty(players) then return false

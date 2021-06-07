@@ -29,12 +29,14 @@ net.Receive("pyrition_message", function()
 	local enumeration = net.ReadUInt(2) + 1
 	local key = net.ReadString()
 	
+	print("got pyrition_message with", enumeration, key)
+	
 	if net.ReadBool() then 
 		local phrases = {}
 		
 		repeat phrases[net.ReadString()] = net.ReadString()
 		until not net.ReadBool()
 		
-		hook.Call("LanguageMessage", GAMEMODE, enumeration, key, phrases)
-	else hook.Call("LanguageMessage", GAMEMODE, enumeration, key) end
+		hook.Call("PyritionLanguageMessage", PYRITION, LocalPlayer(), enumeration, key, phrases)
+	else hook.Call("PyritionLanguageMessage", PYRITION, LocalPlayer(), enumeration, key) end
 end)

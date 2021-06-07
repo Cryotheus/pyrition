@@ -66,13 +66,22 @@ function PYRITION:PyritionConsoleInitializeCommand(file_path, command, command_d
 function PYRITION:PyritionConsoleRunMediatedCommand(ply, command, arguments, arguments_string)
 	net.Start("pyrition_console")
 	net.WriteString(command)
-	net.WriteString(arguments_string)
 	
-	--arguments can be full strings with spaces and other characters in them
-	for index, argument in ipairs(arguments) do
+	if #arguments > 0 then
+		local passed = false
+		
 		net.WriteBool(true)
-		net.WriteString(argument)
-	end
+		net.WriteString(arguments_string)
+		
+		for index, argument in ipairs(arguments) do
+			if passed then net.WriteBool(true)
+			else passed = true end
+			
+			net.WriteString(argument)
+		end
+		
+		net.WriteBool(false)
+	else net.WriteBool(false) end
 	
 	net.SendToServer()
 end

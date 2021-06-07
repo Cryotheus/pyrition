@@ -7,7 +7,7 @@ COMMAND.Tree = {
 			local players = hook.Call("PyritionPlayerFind", PYRITION, arguments_string, ply)
 			
 			if players then for index, ply in ipairs(players) do ply:SendLua("game.CleanUpMap()") end
-			else self:Fail("No targets.") end
+			else self:Fail(ply, "No targets.") end
 		end,
 		
 		map = function(self, ply, arguments, arguments_string) game.CleanUpMap() end

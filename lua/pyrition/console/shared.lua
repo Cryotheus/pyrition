@@ -44,7 +44,7 @@ local command_defaults = {
 if SERVER then
 	command_defaults.Fail = function(self, ply, key, phrases)
 		if phrases then hook.Call("PyritionLanguageSendFormat", PYRITION, ply, HUD_PRINTCONSOLE, key, phrases)
-		else hook.Call("PyritionLanguageSendFormat", PYRITION, ply, HUD_PRINTCONSOLE, key) end
+		else hook.Call("PyritionLanguageSend", PYRITION, ply, HUD_PRINTCONSOLE, key) end
 	end
 else command_defaults.Fail = function(self, ply, key, phrases) hook.Call("PyritionLanguageMessage", PYRITION, ply, HUD_PRINTCONSOLE, key or "Failed.", phrases) end end
 

@@ -50,6 +50,7 @@ local config = {
 	
 	players = {
 		discovery = 15,		--1 111
+		landing = 10,		--1 010 make this server side when done debugging
 		meta = 10,			--1 010
 		storage = 10,		--1 010
 		
@@ -72,7 +73,7 @@ local branding = "Pyrition"
 local max_depth = 4
 
 --reload command
-local reload_command = "pyrition_reload"
+--local reload_command = "pyrition_reload"
 
 --colors
 local color_generic = Color(255, 255, 255)
@@ -146,14 +147,14 @@ local function load_scripts(command_reload)
 end
 
 --concommands
-concommand.Add(reload_command, function(ply)
+--[[concommand.Add(reload_command, function(ply)
 	--is it possible to run a command from client and execute the serverside command when the command is shared?
 	if not IsValid(ply) or ply:IsSuperAdmin() or IsValid(LocalPlayer()) and ply == LocalPlayer() then
 		--put what you need before reloading here
 		load_scripts(true)
 		--put what you need after reloading here
 	end
-end, nil, "Reload all " .. branding .. " scripts.")
+end, nil, "Reload all " .. branding .. " scripts.")]]
 
 --post function setup
 load_scripts(false)

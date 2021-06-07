@@ -54,14 +54,17 @@ end
 --commands
 concommand.Add("pyrition", function(...) hook.Call("PyritionConsoleRunCommand", PYRITION, ...) end)
 
+concommand.Add("pyrition_reload_media", function(ply, command, arguments, arguments_string)
+	if IsValid(ply) then
+		if syncing_players[ply] then ply:PrintMessage(HUD_PRINTCONSOLE, "Already performing a sync.")
+		else syncing_players[ply] = 0 end
+	else print("I'm sorry John, you can't sync the server to itself.") end
+end)
+
 --hooks
 hook.Add("PlayerDisconnected", "pyrition_console", function(ply) syncing_players[ply] = nil end)
-
-hook.Add("PyritionPlayerInitialized", "pyrition_console", function(ply, emulated)
-	print("adding player to sync", ply, emulated)
-	
-	syncing_players[ply] = 0
-end)
+hook.Add("PyritionConsoleLoadCommands", "pyrition_console", function(path) mediated_commands = {} end)
+hook.Add("PyritionPlayerInitialized", "pyrition_console", function(ply, emulated) syncing_players[ply] = 0 end)
 
 hook.Add("Think", "pyrition_console", function()
 	local commands = PYRITION.Commands
@@ -99,9 +102,13 @@ net.Receive("pyrition_console", function(length, ply)
 	
 	if command_data and has_flag(command_data.Realm, PYRITION_MEDIATED) then
 		local arguments = {}
-		local arguments_string = net.ReadString()
+		local arguments_string = ""
 		
-		while net.ReadBool() do table.insert(arguments, net.ReadString()) end
+		if net.ReadBool() then
+			arguments_string = net.ReadString()
+			
+			repeat table.insert(arguments, net.ReadString()) until not net.ReadBool()
+		end
 		
 		hook.Call("PyritionConsoleRunMediatedCommand", PYRITION, ply, command, arguments, arguments_string)
 	end

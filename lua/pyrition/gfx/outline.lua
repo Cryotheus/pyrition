@@ -14,8 +14,8 @@ local render_target_first = render.GetScreenEffectTexture(0)
 local render_target_second = render.GetScreenEffectTexture(1)
 
 --render parameters
-local outline_scale = 4
-local outline_step = 2
+local outline_scale = 2
+local outline_step = 1
 local outline_min = -outline_scale
 local outline_max = outline_scale
 
@@ -254,7 +254,9 @@ end
 hook.Add("PostDrawEffects", "pyrition_gfx_outline", function()
 	local scr_w, scr_h = ScrW(), ScrH()
 	
-	for index, data in ipairs(PYRITION.GFX.Outline) do
+	local groups = PYRITION.GFX.Outline
+	
+	for index, data in ipairs(groups) do
 		if data.ignore_z then draw_outlines(data.entities, data.r, data.g, data.b, data.a, scr_w, scr_h)
 		else draw_outlines_depth(data.entities, data.r, data.g, data.b, data.a, scr_w, scr_h) end
 	end
@@ -268,6 +270,19 @@ function PYRITION:PyritionGFXOutlineHaloOverride()
 	
 	local halos = PYRITION.GFX.Halo
 	local scr_w, scr_h = ScrW(), ScrH()
+	
+	--temporary code
+	--not if you're trying to under stand how to add outlines:
+	--this is not the right way
+	--you wouldn't have to add them every frame, instead make this kind of table in PYRITION.GFX.Outline (must be a sequential entry)
+	table.insert(halos, {
+		r = 255,
+		g = 0,
+		b = 0,
+		a = 64,
+		
+		entities = player.GetBots()
+	})
 	
 	if #halos == 0 then return end
 	

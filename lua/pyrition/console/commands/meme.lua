@@ -86,8 +86,8 @@ COMMAND.Tree = {
 	
 	enable = {
 		enjoyer = {
-			function(self, arguments)
-				if meme_active then return self:Fail("A meme is already active.")
+			function(self, ply, arguments, arguments_string)
+				if meme_active then return self:Fail(ply, "A meme is already active.")
 				else
 					meme_active = true
 					meme_text = {"average gmod fan", "average gmod enjoyer"}
@@ -189,11 +189,11 @@ COMMAND.Tree = {
 				end)
 			end,
 			
-			header = function(self, arguments) meme_enjoyer_header = math.Clamp(tonumber(arguments[1]) or meme_rate, 0, 1) end,
-			squeeze = function(self, arguments) meme_enjoyer_squeeze = math.Clamp(tonumber(arguments[1]) or meme_rate, 0.1, 1) end,
+			header = function(self, ply, arguments, arguments_string) meme_enjoyer_header = math.Clamp(tonumber(arguments[1]) or meme_rate, 0, 1) end,
+			squeeze = function(self, ply, arguments, arguments_string) meme_enjoyer_squeeze = math.Clamp(tonumber(arguments[1]) or meme_rate, 0.1, 1) end,
 		},
 		
-		stare = function(self, arguments)
+		stare = function(self, ply, arguments, arguments_string)
 			hook.Add("PrePlayerDraw", "pyrition_meme", function(ply)
 				local bone_id = ply:LookupBone("ValveBiped.Bip01_Head1")
 				
@@ -216,7 +216,7 @@ COMMAND.Tree = {
 		end
 	},
 	
-	rate = function(self, arguments) meme_rate = math.Clamp(tonumber(arguments[1]) or meme_rate, 0.1, 10) end,
+	rate = function(self, ply, arguments, arguments_string) meme_rate = math.Clamp(tonumber(arguments[1]) or meme_rate, 0.1, 10) end,
 	
-	text = function(self, arguments) meme_text = arguments end
+	text = function(self, ply, arguments, arguments_string) meme_text = arguments end
 }

@@ -6,6 +6,6 @@ function COMMAND:Execute(ply, arguments, arguments_string)
 		local reason = arguments[2]
 		
 		if players then for index, ply in ipairs(players) do ply:Kick(reason) end
-		else self:Fail("No targets.") end
-	else self:Fail("You must specify a player.") end
+		else self:Fail(ply, "No targets.") end
+	else self:Fail(ply, "You must specify a player.") end
 end
