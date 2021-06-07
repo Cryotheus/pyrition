@@ -4,14 +4,18 @@
 --status: active
 --motivation: pure rage and anger over the sanctuary sandbox server
 PYRITION = {
+	Backup = PYRITION and PYRITION.Backup or {},
 	Commands = {},
 	
 	GFX = PYRITION and PYRITION.GFX or {
 		BlipOutline = {},
-		Outline = {}
+		Outline = {},
+		Halo = {}
 	},
 	
-	MediaCommands = PYRITION and PYRITION.MediaCommands or {}
+	MediaCommands = PYRITION and PYRITION.MediaCommands or {},
+	
+	Players = {Time = {}}
 }
 
 PYRITION_CLIENT = 1 --include on client, AddCSLua
@@ -25,17 +29,17 @@ PYRITION_MAP_DIAGONAL = 113512 --113511.681725
 
 --config
 local config = {
-	client = 29,	--11 101
-	server = 26,	--11 010
+	client = 37,	--100 101
+	server = 34,	--100 010
 	
 	console = {
-		client = 21,	--10 101
-		shared = 15,	--01 111
-		server = 18		--10 010
+		client = 29,	--11 101
+		server = 26,	--11 010
+		shared = 23		--10 111
 	},
 	
 	gfx = {
-		outline = 5,	--0 101
+		outline = 5,		--0 101
 		outline_blip = 5	--0 101
 	},
 	
@@ -45,7 +49,19 @@ local config = {
 	},
 	
 	players = {
-		discovery = 7	--0 111
+		discovery = 15,		--1 111
+		meta = 10,			--1 010
+		storage = 10,		--1 010
+		
+		time = {
+			client = 13,	--1 101
+			server = 10,	--1 010
+			shared = 7		--0 111
+		}
+	},
+	
+	resource = {
+		server = 10	--1 010
 	}
 }
 

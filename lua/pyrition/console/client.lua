@@ -75,8 +75,6 @@ function PYRITION:PyritionConsoleRunMediatedCommand(ply, command, arguments, arg
 	end
 	
 	net.SendToServer()
-	
-	print("PyritionConsoleRunMediatedCommand", ply, command, arguments, arguments_string)
 end
 
 --commands
@@ -90,8 +88,6 @@ end, hook.Call(PyritionLanguageFormat, PYRITION, "pyrition.commands"))
 
 --net
 net.Receive("pyrition_console", function(length)
-	print("we got a pyrition_console net message!")
-	
 	repeat
 		local command, command_data = read_media_command(command_data)
 		

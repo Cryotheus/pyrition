@@ -6,10 +6,10 @@ local prefix_functions = {
 	end,
 	
 	--user id
-	["#"] = function(...) return hook.Call("PyritionPlayersFindByUserID", PYRITION, ...) end,
+	["#"] = function(...) return hook.Call("PyritionPlayerFindByUserID", PYRITION, ...) end,
 	
 	--steam id
-	["$"] = function(...) return hook.Call("PyritionPlayersFindBySteamID", PYRITION, ...) end,
+	["$"] = function(...) return hook.Call("PyritionPlayerFindBySteamID", PYRITION, ...) end,
 	
 	--everyone in your user group and above
 	["%"] = function(needle, supplicant) return false end,
@@ -22,11 +22,11 @@ local prefix_functions = {
 			local first_character = string.Left(needle, 1)
 			
 			if first_character == "^" then
-				if IsValid(supplicant) then return hook.Call("PyritionPlayersFindByUserGroup", PYRITION, supplicant:GetUserGroup(), supplicant)
+				if IsValid(supplicant) then return hook.Call("PyritionPlayerFindByUserGroup", PYRITION, supplicant:GetUserGroup(), supplicant)
 				else return false end
 			end
 			
-			return hook.Call("PyritionPlayersFindByUserGroup", PYRITION, needle, supplicant)
+			return hook.Call("PyritionPlayerFindByUserGroup", PYRITION, needle, supplicant)
 		else
 			local ply = ply or LocalPlayer and LocalPlayer() or false
 			
@@ -39,7 +39,7 @@ local prefix_functions = {
 	["*"] = function(needle, supplicant) return player.GetAll() end
 }
 
-function PYRITION:PyritionPlayersFind(needle, supplicant, ...)
+function PYRITION:PyritionPlayerFind(needle, supplicant, ...)
 	local first_character = string.Left(needle, 1)
 	local invert = false
 	local players
@@ -84,7 +84,7 @@ function PYRITION:PyritionPlayersFind(needle, supplicant, ...)
 	return players
 end
 
-function PYRITION:PyritionPlayersFindByUserGroup(user_group, supplicant)
+function PYRITION:PyritionPlayerFindByUserGroup(user_group, supplicant)
 	local players = {}
 	
 	for index, ply in ipairs(player.GetAll()) do if ply:IsUserGroup(user_group) then table.insert(players, ply) end end
@@ -94,7 +94,7 @@ function PYRITION:PyritionPlayersFindByUserGroup(user_group, supplicant)
 	return players
 end
 
-function PYRITION:PyritionPlayersFindBySteamID(needle, supplicant)
+function PYRITION:PyritionPlayerFindBySteamID(needle, supplicant)
 	local all_players = player.GetAll()
 	local players = false
 	
@@ -120,7 +120,7 @@ function PYRITION:PyritionPlayersFindBySteamID(needle, supplicant)
 	return players
 end
 
-function PYRITION:PyritionPlayersFindByUserID(user_id, supplicant)
+function PYRITION:PyritionPlayerFindByUserID(user_id, supplicant)
 	user_id = tonumber(user_id)
 	
 	if user_id then

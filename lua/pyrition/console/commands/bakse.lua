@@ -4,7 +4,7 @@ COMMAND.Realm = PYRITION_MEDIATED
 COMMAND.Tree = {
 	cleanup = {
 		function(self, ply, arguments, arguments_string)
-			local players = hook.Call("PyritionPlayersFind", PYRITION, arguments_string, ply)
+			local players = hook.Call("PyritionPlayerFind", PYRITION, arguments_string, ply)
 			
 			if players then for index, ply in ipairs(players) do ply:SendLua("game.CleanUpMap()") end
 			else self:Fail("No targets.") end

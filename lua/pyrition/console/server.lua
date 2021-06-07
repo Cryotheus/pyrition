@@ -1,5 +1,4 @@
 util.AddNetworkString("pyrition_console")
-resource.AddSingleFile("resource/localization/en/pyrition.properties")
 
 --locals
 local color_generic = Color(255, 255, 255)

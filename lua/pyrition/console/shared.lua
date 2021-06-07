@@ -46,7 +46,7 @@ if SERVER then
 		if phrases then hook.Call("PyritionLanguageSendFormat", PYRITION, ply, HUD_PRINTCONSOLE, key, phrases)
 		else hook.Call("PyritionLanguageSendFormat", PYRITION, ply, HUD_PRINTCONSOLE, key) end
 	end
-else command_defaults.Fail = function(self, ply, key, phrases) hook.Call("PyritionLanguageMessage", PYRITION, ply, HUD_PRINTCONSOLE, key, phrases) end end
+else command_defaults.Fail = function(self, ply, key, phrases) hook.Call("PyritionLanguageMessage", PYRITION, ply, HUD_PRINTCONSOLE, key or "Failed.", phrases) end end
 
 --local functions
 local function count_functions(field, depth)
@@ -69,18 +69,21 @@ function PYRITION:PyritionConsoleLoadCommands(path)
 	
 	for index, file_name in ipairs(files) do
 		local command = string.StripExtension(file_name)
-		local command_error = "worked?"
+		local command_error = "pyrition did not find an error"
+		local command_script
 		local command_tree = true
 		local file_path = path .. file_name
+		local valid_command
 		
 		COMMAND = table.Copy(command_defaults)
 		COMMAND.Command = command
 		COMMAND.ID = index
 		
-		local valid_command = xpcall(function()
-			--anger!
-			include(file_path)
-		end, function() command_error = "error!" end)
+		local command_script = CompileFile(file_path)
+		
+		COMMAND.Function = command_script
+		
+		if command_script then valid_command = xpcall(command_script, function(error_message) command_error = error_message end) end
 		
 		PYRITION.Commands[command] = COMMAND
 		

@@ -1,10 +1,17 @@
+--[[ entry structure
+
+{
+	r = number,
+	g = number,
+	b = number,
+	a = number,
+	entity = entity
+}
+]]
+
 --locals
-local eye_trace = {}
-local aim_entity_old
-local aim_entity_old_index = 0
 local render_target_art = render.GetScreenEffectTexture(0)
 local render_target_outline = render.GetScreenEffectTexture(1)
-local trace = {mask = MASK_SHOT, output = eye_trace}
 
 --render parameters
 local blip_period = 2
@@ -123,10 +130,10 @@ local function draw_blip(entity, r, g, b, a, real_time, scr_w, scr_h, blip_modul
 			fl_surface_SetMaterial(material_art)
 			
 			for x = outline_min, outline_max, outline_step do
-				if x == 0 then continue end
+				local x_zero = x == 0
 				
 				for y = outline_min, outline_max, outline_step do
-					if y == 0 then continue end
+					if x_zero and y == 0 then continue end
 					
 					fl_surface_DrawTexturedRect(x, y, scr_w, scr_h)
 				end
@@ -157,7 +164,7 @@ local function draw_blip(entity, r, g, b, a, real_time, scr_w, scr_h, blip_modul
 end
 
 --hooks
-hook.Add("PostDrawEffects", "pyrition_outline_blip", function()
+hook.Add("PostDrawEffects", "pyrition_gfx_outline_blip", function()
 	local entities = PYRITION.GFX.BlipOutline
 	local real_time = RealTime()
 	local scr_w, scr_h = ScrW(), ScrH()

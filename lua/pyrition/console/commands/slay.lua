@@ -2,7 +2,7 @@ COMMAND.Realm = PYRITION_MEDIATED
 
 function COMMAND:Execute(ply, arguments, arguments_string)
 	if #arguments_string > 0 then
-		local players = hook.Call("PyritionPlayersFind", PYRITION, arguments_string, ply)
+		local players = hook.Call("PyritionPlayerFind", PYRITION, arguments_string, ply)
 		
 		if players then for index, ply in ipairs(players) do ply:Kill() end
 		else self:Fail("No targets.") end
