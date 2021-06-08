@@ -8,18 +8,22 @@ local command_defaults = {
 			local local_arguments = table.Copy(arguments)
 			
 			for index, branch in ipairs(arguments) do
-				--force_parameter tells us that we prefixed with ? and that this is a parameter, not a sub command or namespace
-				local force_parameter = string.StartWith(branch, "?")
-				local tree = current[force_parameter and string.sub(branch, 2) or branch]
+				--force argument tells us that we prefixed with ? and that this is an argument, not a sub command or namespace
+				local force_argument = string.StartWith(branch, "?") and string.TrimLeft(branch, "?") ~= "?"
+				local tree = current[force_argument and string.sub(branch, 2) or branch]
+				
+				if force_argument and tree then
+					arguments_string = string.sub(arguments_string, 2)
+					local_arguments[1] = string.sub(local_arguments[1], 2)
+					
+					break
+				end
 				
 				if istable(tree) then --we hit another tree of sub commands
 					arguments_string = string.sub(arguments_string, #branch + 2)
 					current = tree
 					
 					table.remove(local_arguments, 1)
-					
-					--if force_parameter, we want to run the root function of this tree
-					if force_parameter then break end
 				elseif isfunction(tree) then --we hit a sub command
 					table.remove(local_arguments, 1)
 					
