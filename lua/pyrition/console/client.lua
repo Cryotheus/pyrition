@@ -119,7 +119,7 @@ net.Receive("pyrition_console", function(length)
 			end
 		else PYRITION.Commands[command] = command_data end
 		
-		PYRITION.MediaCommands[command] = command_data
+		--PYRITION.MediaCommands[command] = command_data
 	until not net.ReadBool()
 end)
 

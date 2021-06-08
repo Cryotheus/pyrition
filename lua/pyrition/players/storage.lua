@@ -39,7 +39,7 @@ function PYRITION:PyritionPlayerStorageSave(ply)
 		}
 		
 		file.CreateDir(path)
-		hook.Call("PyritionPlayerStorageSaveMeta", PYRITION, storage_path .. "/meta.txt", ply)
+		hook.Call("PyritionPlayerStorageSaveMeta", PYRITION, storage_path .. "/meta.json", ply)
 		
 		return true
 	end

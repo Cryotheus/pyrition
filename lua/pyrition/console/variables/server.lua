@@ -1,0 +1,1 @@
+util.AddNetworkString("pyrition_console_variable")

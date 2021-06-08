@@ -8,18 +8,23 @@ local command_defaults = {
 			local local_arguments = table.Copy(arguments)
 			
 			for index, branch in ipairs(arguments) do
-				local tree = current[branch]
+				--force_parameter tells us that we prefixed with ? and that this is a parameter, not a sub command or namespace
+				local force_parameter = string.StartWith(branch, "?")
+				local tree = current[force_parameter and string.sub(branch, 2) or branch]
 				
-				if istable(tree) then
+				if istable(tree) then --we hit another tree of sub commands
 					arguments_string = string.sub(arguments_string, #branch + 2)
 					current = tree
 					
 					table.remove(local_arguments, 1)
-				elseif isfunction(tree) then
+					
+					--if force_parameter, we want to run the root function of this tree
+					if force_parameter then break end
+				elseif isfunction(tree) then --we hit a sub command
 					table.remove(local_arguments, 1)
 					
 					return tree(self, ply, local_arguments, string.sub(arguments_string, #branch + 2))
-				else break end
+				else break end --we are now just parameters for the root function of the current
 			end
 			
 			local root_function = current[1]
@@ -38,13 +43,19 @@ local command_defaults = {
 	
 	Initialize = function(self) return true end,
 	PostInitialize = function(self) return true end,
-	Success = function(self, message) print(message or "Success.") end
+	Success = function(self, ply, key, phrases) print(key or "Success.") end,
+	VariablesInitialized = function(self, command_variables) end,
+	VariableMeta = {}
 }
 
 if SERVER then
 	command_defaults.Fail = function(self, ply, key, phrases)
-		if phrases then hook.Call("PyritionLanguageSendFormat", PYRITION, ply, HUD_PRINTCONSOLE, key, phrases)
-		else hook.Call("PyritionLanguageSend", PYRITION, ply, HUD_PRINTCONSOLE, key) end
+		print(self, ply, key, phrases)
+		
+		if IsValid(ply) then
+			if phrases then hook.Call("PyritionLanguageSendFormat", PYRITION, ply, HUD_PRINTCONSOLE, key, phrases)
+			else hook.Call("PyritionLanguageSend", PYRITION, ply, HUD_PRINTCONSOLE, key) end
+		else MsgC(color_significant, "[Pyrition] ", color_generic, key) end
 	end
 else command_defaults.Fail = function(self, ply, key, phrases) hook.Call("PyritionLanguageMessage", PYRITION, ply, HUD_PRINTCONSOLE, key or "Failed.", phrases) end end
 
@@ -85,10 +96,13 @@ function PYRITION:PyritionConsoleLoadCommands(path)
 		
 		if command_script then valid_command = xpcall(command_script, function(error_message) command_error = error_message end) end
 		
-		PYRITION.Commands[command] = COMMAND
-		
 		if valid_command then
 			if COMMAND:Initialize() and hook.Call("PyritionConsoleInitializeCommand", self, file_path, command, COMMAND) then
+				local command_variables = hook.Call("PyritionConsoleVariableLoadCommand", self, command, COMMAND)
+				COMMAND.Variables = command_variables
+				
+				COMMAND:VariablesInitialized(command_variables)
+				
 				if COMMAND.Tree then
 					local function_count = count_functions(COMMAND.Tree, 0)
 					COMMAND.TreeCommandCount = function_count
@@ -96,13 +110,15 @@ function PYRITION:PyritionConsoleLoadCommands(path)
 					MsgC(color_generic, " ]        command " .. command .. " = " .. function_count .. "\n")
 				else MsgC(color_generic, " ]        command " .. command .. "\n") end
 				
+				PYRITION.Commands[command] = COMMAND
+				
+				COMMAND:PostInitialize()
+				
 				continue
 			end
 			
 			MsgC(color_generic, " ]        command " .. command .. " (skipped)\n")
 		else MsgC(color_generic, " ]        command " .. command .. " (erred: [" .. command_error .. "])\n") end
-		
-		PYRITION.Commands[command] = nil
 	end
 	
 	COMMAND = nil

@@ -6,7 +6,6 @@ local custom_default_code
 local editor_control_table
 local template_load
 
---sources
 --local functions
 local function global_panel_update(class, updater)
 	--runs the function provided on the panel's table and all panels active under the world panel 
@@ -87,6 +86,7 @@ COMMAND.Tree = {
 	}
 }
 
+--command functions
 function COMMAND:Initialize()
 	editor_control_table = vgui.GetControlTable("Expression2EditorFrame")
 	

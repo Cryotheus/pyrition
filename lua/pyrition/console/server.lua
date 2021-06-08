@@ -100,6 +100,8 @@ net.Receive("pyrition_console", function(length, ply)
 	local command = net.ReadString()
 	local command_data = PYRITION.Commands[command]
 	
+	--we gotta make sure this is actually a mediated command, we don't want server-only commands getting run by clients
+	--unless we make an rcon or something
 	if command_data and has_flag(command_data.Realm, PYRITION_MEDIATED) then
 		local arguments = {}
 		local arguments_string = ""

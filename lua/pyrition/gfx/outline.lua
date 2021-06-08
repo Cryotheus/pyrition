@@ -275,13 +275,17 @@ function PYRITION:PyritionGFXOutlineHaloOverride()
 	--not if you're trying to under stand how to add outlines:
 	--this is not the right way
 	--you wouldn't have to add them every frame, instead make this kind of table in PYRITION.GFX.Outline (must be a sequential entry)
+	local bots = {}
+	
+	for index, bot in ipairs(player.GetBots()) do if IsValid(bot) and bot:Alive() then table.insert(bots, bot) end end
+	
 	table.insert(halos, {
 		r = 255,
 		g = 0,
 		b = 0,
 		a = 64,
 		
-		entities = player.GetBots()
+		entities = bots
 	})
 	
 	if #halos == 0 then return end

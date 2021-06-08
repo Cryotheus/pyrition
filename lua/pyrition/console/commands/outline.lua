@@ -16,7 +16,7 @@ PYRITION.Backup.halo_add = add_function
 PYRITION.Backup.halo_hook = hook_function
 
 --local functions
-local function disable_halo_override()
+local function disable_halo_override(self)
 	halo_overriden = false
 	
 	--global functions
@@ -24,9 +24,10 @@ local function disable_halo_override()
 	
 	--hooks
 	hook.Add("PostDrawEffects", "RenderHalos", hook_function)
+	hook.Call("PyritionConsoleVariableSet", PYRITION, self.Command, self, "halo_override", false)
 end
 
-local function enable_halo_override()
+local function enable_halo_override(self)
 	halo_overriden = true
 	
 	--global functions
@@ -51,6 +52,7 @@ local function enable_halo_override()
 	end
 	
 	--hooks
+	hook.Call("PyritionConsoleVariableSet", PYRITION, self.Command, self, "halo_override", true)
 	hook.Remove("PostDrawEffects", "RenderHalos")
 end
 
@@ -64,12 +66,15 @@ COMMAND.Tree = {
 	}
 }
 
+COMMAND.VariableMeta = {
+	halo_override = {
+		Default = true,
+		TypeFlag = PYRITION_VARIABLE_BOOL
+	}
+}
+
 --command functions
-function COMMAND:Initialize()
-	enable_halo_override()
-	
-	return true
-end
+function COMMAND:VariablesInitialized(command_variables) if command_variables.halo_override then enable_halo_override(self) end end
 
 --hooks
 hook.Add("PyritionGFXOutlineHaloOverride", "pyrition_console_command_outline", function() if not halo_overriden then return true end end)

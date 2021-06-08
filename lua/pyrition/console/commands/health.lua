@@ -1,5 +1,6 @@
 COMMAND.Realm = PYRITION_MEDIATED
 
+--local functions
 local function valid_health(health)
 	health = tonumber(health)
 	
@@ -8,6 +9,7 @@ local function valid_health(health)
 	return false
 end
 
+--command functions
 function COMMAND:Execute(ply, arguments, arguments_string)
 	if #arguments == 2 then
 		local health = valid_health(arguments[2])
