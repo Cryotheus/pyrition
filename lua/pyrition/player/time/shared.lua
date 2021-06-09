@@ -3,6 +3,6 @@ local session_times = {} --their previous session time to add
 local total_times = {} --their total play time on the server
 
 --globals
-PYRITION.Players.Time.Sessions = session_times
-PYRITION.Players.Time.SessionStarts = session_start_times
-PYRITION.Players.Time.Total = total_times
+PYRITION.Player.Time.Sessions = session_times
+PYRITION.Player.Time.SessionStarts = session_start_times
+PYRITION.Player.Time.Total = total_times

@@ -129,13 +129,7 @@ function PYRITION:PyritionConsoleVariableSave(changes)
 				if type_function then command_variable_changes[key] = type_function(variable_meta, value) end
 			end
 			
-			print(self.Variables[command], "should be the same as", command_variables, "before merge")
-			
 			table.Merge(command_variables, command_variable_changes)
-			
-			print(self.Variables[command], "should be the same as", command_variables, "after merge as well")
-			print("command_variables", command_variables)
-			PrintTable(command_variables, 1)
 			
 			local json = util.TableToJSON(command_variables, pretty_print)
 			

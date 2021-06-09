@@ -14,7 +14,12 @@ PYRITION = {
 	},
 	
 	--MediaCommands = PYRITION and PYRITION.MediaCommands or {}, --went unused
-	Players = {Time = {}},
+	Player = {
+		Storage = {}, --the keys should reflect the file's name without the extension
+		StorageTailored = {},
+		Time = {}
+	},
+	
 	Variables = {}
 }
 
@@ -67,7 +72,7 @@ local config = {
 		server = 2	--0 010
 	},
 	
-	players = {
+	player = {
 		discovery = 15,		--1 111
 		landing = 10,		--1 010 make this server side when done debugging
 		meta = 10,			--1 010
