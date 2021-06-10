@@ -128,4 +128,5 @@ hook.Add("PlayerDisconnected", "pyrition_player_storage", function(ply)
 	timer.Simple(0, function() player_storages[ply] = nil end)
 end)
 
-hook.Add("PlayerInitialSpawn", "pyrition_player_storage", function(ply, map_transition) hook.Call("PyritionPlayerStorageLoad", PYRITION, ply) end)
+hook.Add("PlayerInitialSpawn", "pyrition_player_storage", function(ply) hook.Call("PyritionPlayerStorageLoad", PYRITION, ply) end)
+hook.Add("ShutDown", "pyrition_player_storage", function() for index, ply in ipairs(player.GetHumans()) do hook.Call("PyritionPlayerStorageSave", PYRITION, ply) end end)

@@ -33,6 +33,9 @@ end
 function PYRITION:PyritionPlayerTimeGetSession(ply) return ply:TimeConnected() - session_start_times[ply] + session_times[ply] end
 
 --this is in minutes, not seconds!
+function PYRITION:PyritionPlayerTimeGetSessionPrior(ply) return session_times[ply] end
+
+--this is in minutes, not seconds!
 function PYRITION:PyritionPlayerTimeGetTotalSessions(ply) 
 	local prior_time = hook.Call("PyritionPlayerTimeGetSessionPrior", self, ply)
 	local session_time = hook.Call("PyritionPlayerTimeGetSession", self, ply)
@@ -41,9 +44,6 @@ function PYRITION:PyritionPlayerTimeGetTotalSessions(ply)
 	--also save it as minutes
 	return total_times[ply] + math.floor(session_time / 60) - prior_time
 end
-
---this is in minutes, not seconds!
-function PYRITION:PyritionPlayerTimeGetSessionPrior(ply) return session_times[ply] end
 
 --hooks
 hook.Add("InitPostEntity", "pyrition_player_time", function()
@@ -76,7 +76,7 @@ hook.Add("PlayerDisconnected", "pyrition_player_time", function(ply)
 	end)
 end)
 
-hook.Add("PyritionPlayerInitialized", "pyrition_player_time", function(ply, map_transition)
+hook.Add("PyritionPlayerInitialized", "pyrition_player_time", function(ply)
 	--instead of initial sync, we want a hook that gets called when the player first moves\
 	if ply:IsBot() then
 		session_start_times[ply] = 0
@@ -88,20 +88,27 @@ hook.Add("PyritionPlayerInitialized", "pyrition_player_time", function(ply, map_
 	local player_storage = PYRITION.Player.Storage[ply]
 	local player_storage_meta = player_storage.meta
 	session_start_times[ply] = ply:TimeConnected()
+	local transfer_session
 	
-	if (map_transition or prior_sessions_always) and prior_sessions then
+	if prior_sessions then
 		local steam_id = ply:SteamID()
+		local session_time = prior_sessions[steam_id]
 		
-		prior_session_count = prior_session_count - 1
-		session_times[ply] = prior_sessions[steam_id]
-		
-		if prior_session_count <= 0 or CurTime() / 60 > prior_session_expire_time then
-			if prior_session_count > 0 then print("Prior session times expired; reconnecting players will not have their session times resumed.")
-			else print("All prior session times resumed.") end
+		if session_time then
+			prior_session_count = prior_session_count - 1
+			session_times[ply] = session_time
+			transfer_session = session_time >= 1 and session_time
 			
-			prior_session_count = nil
-			prior_sessions = nil
-		else prior_sessions[steam_id] = nil end
+			if prior_session_count <= 0 or CurTime() / 60 > prior_session_expire_time then
+				if prior_session_count > 0 then print("Prior session times expired; reconnecting players will not have their session times resumed.")
+				else print("All prior session times resumed.") end
+				
+				file.Delete("pyrition/players/sessions.json")
+				
+				prior_session_count = nil
+				prior_sessions = nil
+			else prior_sessions[steam_id] = nil end
+		end
 	else session_times[ply] = 0 end
 	
 	local name = ply:Nick()
@@ -109,18 +116,21 @@ hook.Add("PyritionPlayerInitialized", "pyrition_player_time", function(ply, map_
 	local unix_time = os.time()
 	
 	if old_name then
-		if old_name ~= name then PrintMessage(HUD_PRINTTALK, name .. (", formerly know as " .. old_name .. ", has loaded in. (Last visited " .. string.NiceTime(unix_time - player_storage.time.visit) .. " ago)"))
-		else PrintMessage(HUD_PRINTTALK, name .. (" has loaded in. (Last visited " .. string.NiceTime(unix_time - player_storage.time.visit) .. " ago)")) end
-	else PrintMessage(HUD_PRINTTALK, name .. (" has loaded in for the first time.")) end
+		local last_visited = transfer_session and " (Continuing session lasting " .. string.NiceTime(transfer_session * 60) .. ")" or " (Last visited " .. string.NiceTime(unix_time - player_storage.time.visit) .. " ago)"
+		
+		if old_name ~= name then PrintMessage(HUD_PRINTTALK, name .. ", formerly know as " .. old_name .. ", has loaded in." .. last_visited)
+		else PrintMessage(HUD_PRINTTALK, name .. " has loaded in." .. last_visited) end
+	else PrintMessage(HUD_PRINTTALK, name .. " has loaded in for the first time.") end
 	
 	player_storage.time.visit = unix_time
 end)
 
 hook.Add("ShutDown", "pyrition_player_time", function()
-	local time_table = {shutdown = true}
+	local time_table = {}
 	
-	for index, ply in ipairs(player.GetHumans()) do time_table[ply:SteamID()] = hook.Call("PyritionPlayerTimeGetSession", PYRITION, ply) / 60 end
-	if table.IsEmpty(time_table) then return end
+	for index, ply in ipairs(player.GetHumans()) do time_table[ply:SteamID()] = math.floor(hook.Call("PyritionPlayerTimeGetSession", PYRITION, ply) / 60) end
+	if table.IsEmpty(time_table) then return
+	else time_table.shutdown = true end
 	
 	print("\nSaving player session times...")
 	file.CreateDir("pyrition/players")

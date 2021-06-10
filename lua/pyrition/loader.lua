@@ -17,7 +17,12 @@ PYRITION = {
 	Player = {
 		Storage = {}, --the keys should reflect the file's name without the extension
 		StorageTailored = {},
-		Time = {}
+		
+		Time = {
+			Sessions = {},
+			SessionStarts = {},
+			Total = {}
+		}
 	},
 	
 	Variables = {}
@@ -51,6 +56,7 @@ local config = {
 	server = 34,	--100 010
 	
 	console = {
+		chat = 21,		--10 101
 		client = 29,	--11 101
 		server = 26,	--11 010
 		shared = 23,	--10 111

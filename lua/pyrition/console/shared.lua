@@ -136,10 +136,10 @@ function PYRITION:PyritionConsoleRunCommand(ply, command, arguments, arguments_s
 		local command_data = PYRITION.Commands[argument_command]
 		
 		if command_data then
-			table.remove(arguments, 1)
+			arguments_string = string.sub(arguments_string, #argument_command + 2)
 			
-			if isbool(command_data) then hook.Call("PyritionConsoleRunMediatedCommand", PYRITION, ply, argument_command, arguments, string.sub(arguments_string, #argument_command + 2))
-			else command_data:Execute(ply, arguments, string.sub(arguments_string, #argument_command + 2)) end
+			table.remove(arguments, 1)
+			hook.Call("PyritionConsoleExecuteCommand", self, ply, command_data, argument_command, arguments, arguments_string)
 		else print("No entry in command table found.\n") end
 	else hook.Call("PyritionLanguageMessage", PYRITION, ply, 0, "pyrition.insults.unknown_command") end
 end

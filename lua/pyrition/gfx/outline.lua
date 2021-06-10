@@ -283,7 +283,7 @@ function PYRITION:PyritionGFXOutlineHaloOverride()
 		r = 255,
 		g = 0,
 		b = 0,
-		a = 64,
+		a = 16,
 		
 		entities = bots
 	})

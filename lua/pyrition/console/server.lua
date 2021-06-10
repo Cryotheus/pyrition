@@ -37,6 +37,11 @@ local function write_media_commands(command_tree)
 end
 
 --pyrition functions
+function PYRITION:PyritionConsoleExecuteCommand(ply, command_data, command, arguments, arguments_string)
+	--check permissions
+	command_data:Execute(ply, arguments, arguments_string)
+end
+
 function PYRITION:PyritionConsoleInitializeCommand(file_path, command, command_data)
     if has_flag(command_data.Realm, PYRITION_CLIENT) then AddCSLuaFile(file_path) end
     if has_flag(command_data.Realm, PYRITION_MEDIATED) then table.insert(mediated_commands, command) end
@@ -91,7 +96,7 @@ hook.Add("Think", "pyrition_console", function()
 		net.WriteBool(false)
 		net.Send(ply)
 		 
-		if commands_synced >= mediated_amount then print("done with", ply) syncing_players[ply] = nil end
+		if commands_synced >= mediated_amount then syncing_players[ply] = nil end
 	end
 end)
 

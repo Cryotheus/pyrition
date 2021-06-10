@@ -1,6 +1,6 @@
 --locals
 --local functions
-local function execute_media(self, ply, arguments, arguments_string) hook.Call("PyritionConsoleRunMediatedCommand", PYRITION, ply, self.Command, arguments, arguments_string) end
+local function execute_media(command_data, ply, arguments, arguments_string) hook.Call("PyritionConsoleRunMediatedCommand", PYRITION, ply, command_data.Command, arguments, arguments_string) end
 local function has_flag(flags, flag) return bit.band(flags, flag) == flag end
 
 local function read_media_command()
@@ -59,6 +59,13 @@ function PYRITION:PyritionConsoleCompleteCommand(command, arguments)
 	end
 	
 	return self:PyritionLanguageFormat("pyrition.insults.autocomplete")
+end
+
+function PYRITION:PyritionConsoleExecuteCommand(ply, command_data, command, arguments, arguments_string)
+	print(ply, command_data, command, arguments, arguments_string)
+	
+	if isbool(command_data) then hook.Call("PyritionConsoleRunMediatedCommand", PYRITION, ply, argument_command, arguments, arguments_string)
+	else command_data:Execute(ply, arguments, arguments_string) end
 end
 
 function PYRITION:PyritionConsoleInitializeCommand(file_path, command, command_data) return has_flag(command_data.Realm, PYRITION_CLIENT) end
