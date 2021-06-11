@@ -37,17 +37,90 @@ function PANEL:Init()
 		self.btnMaxim:SetEnabled(true)
 		self.btnMinim:SetEnabled(true)
 		
-		function self.btnMaxim:DoClick() self:GetParent():DetachFromContextMenu() end
+		function self.btnMaxim:DoClick()
+			local parent = self:GetParent()
+			
+			if parent.Anchored then parent:DetachFromContextMenu()
+			else
+				parent.PreMaximizedX, parent.PreMaximizedY, parent.PreMaximizedWidth, parent.PreMaximizedHeight = parent:GetBounds()
+				parent.Maximized = true
+				
+				parent:SetPos(0, 0)
+				parent:SetDraggable(false)
+				parent:SetSizable(false)
+				parent:SetSize(ScrW(), ScrH())
+			end
+		end
 		
 		function self.btnMinim:DoClick()
 			local parent = self:GetParent()
 			
-			if parent.Anchored then parent:MinimizeInContextMenu()
-			else parent:AttachToContextMenu() end
+			if parent.Maximized then
+				parent:SetPos(parent.PreMaximizedX, parent.PreMaximizedY)
+				parent:SetDraggable(true)
+				parent:SetSizable(true)
+				parent:SetSize(parent.PreMaximizedWidth, parent.PreMaximizedHeight)
+				
+				parent.Maximized, parent.PreMaximizedX, parent.PreMaximizedY, parent.PreMaximizedWidth, parent.PreMaximizedHeight = false, nil, nil, nil, nil
+			else
+				if parent.Anchored then parent:MinimizeInContextMenu()
+				else parent:AttachToContextMenu() end
+			end
 		end
 	else
 		self.btnMaxim:SetVisible(false)
 		self.btnMinim:SetVisible(false)
+	end
+	
+	do --property sheet
+		local sheet = vgui.Create("DPropertySheet", self)
+		
+		sheet:Dock(FILL)
+		--sheet:DockMargin(0, 0, 0, 0)
+		
+		--create a parent dpanel for all pages we will have
+		--we do this so we only create the page panel if we open the tab, since some pages are $$$
+		for page, page_data in pairs(PYRITION.Pages) do
+			local panel = vgui.Create("DPanel", sheet)
+			
+			print(panel)
+			print(sheet:AddSheet("#pyrition.menu.pages." .. page, panel, page_data.TabIcon, false, false, page_data.TabTooltip))
+			
+			panel.Page = page
+			panel.PageName = page_data.Name
+		end
+		
+		function sheet:OnActiveTabChanged(old_tab, new_tab)
+			local old_panel, new_panel = old_tab:GetPanel(), new_tab:GetPanel()
+			
+			if old_panel and old_panel.PagePanel then old_panel.PagePanel:HolsterTab(new_panel, old_tab, new_tab) end
+			
+			if new_panel.PagePanel then
+				new_panel.PagePanel:DeployTab(old_panel.PagePanel, old_tab, new_tab)
+				
+				return
+			end
+			
+			print(old_panel, new_panel)
+			print(new_panel.Page, new_panel.PageName)
+			
+			local page = vgui.Create(new_panel.PageName, new_panel)
+			
+			page:Dock(FILL)
+			
+			new_panel.PagePanel = page
+		end
+		
+		do --create the first page
+			local active_panel = sheet:GetActiveTab():GetPanel()
+			local page = vgui.Create(active_panel.PageName, active_panel)
+			
+			page:Dock(FILL)
+			
+			active_panel.PagePanel = page
+		end
+		
+		self.PropertySheet = sheet
 	end
 end
 

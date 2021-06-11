@@ -1,3 +1,4 @@
+--locals
 local color_generic = Color(255, 255, 255)
 local color_significant = Color(255, 191, 0)
 
@@ -52,6 +53,7 @@ local command_defaults = {
 	VariableMeta = {}
 }
 
+--pre function set up
 if SERVER then
 	command_defaults.Fail = function(self, ply, key, phrases)
 		print(self, ply, key, phrases)
@@ -80,7 +82,7 @@ function PYRITION:PyritionConsoleLoadCommands(path)
 	--local files = file.Find("lua/" .. path .. "*.lua", "garrysmod")
 	local files = file.Find(path .. "*.lua", "LUA")
 	
-	PYRITION.Commands = {}
+	self.Commands = {}
 	
 	for index, file_name in ipairs(files) do
 		local command = string.StripExtension(file_name)
@@ -114,7 +116,7 @@ function PYRITION:PyritionConsoleLoadCommands(path)
 					MsgC(color_generic, " ]        command " .. command .. " = " .. function_count .. "\n")
 				else MsgC(color_generic, " ]        command " .. command .. "\n") end
 				
-				PYRITION.Commands[command] = COMMAND
+				self.Commands[command] = COMMAND
 				
 				COMMAND:PostInitialize()
 				
@@ -133,7 +135,7 @@ function PYRITION:PyritionConsoleRunCommand(ply, command, arguments, arguments_s
 	local argument_command = arguments[1]
 	
 	if argument_command then
-		local command_data = PYRITION.Commands[argument_command]
+		local command_data = self.Commands[argument_command]
 		
 		if command_data then
 			arguments_string = string.sub(arguments_string, #argument_command + 2)
@@ -141,7 +143,7 @@ function PYRITION:PyritionConsoleRunCommand(ply, command, arguments, arguments_s
 			table.remove(arguments, 1)
 			hook.Call("PyritionConsoleExecuteCommand", self, ply, command_data, argument_command, arguments, arguments_string)
 		else print("No entry in command table found.\n") end
-	else hook.Call("PyritionLanguageMessage", PYRITION, ply, 0, "pyrition.insults.unknown_command") end
+	else hook.Call("PyritionLanguageMessage", self, ply, 0, "pyrition.insults.unknown_command") end
 end
 
 --commands

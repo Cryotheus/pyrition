@@ -13,7 +13,8 @@ PYRITION = {
 		Halo = {}
 	},
 	
-	--MediaCommands = PYRITION and PYRITION.MediaCommands or {}, --went unused
+	Pages = {},
+	
 	Player = {
 		Storage = {}, --the keys should reflect the file's name without the extension
 		StorageTailored = {},
@@ -76,6 +77,11 @@ local config = {
 	language = {
 		client = 5,	--0 101
 		server = 2	--0 010
+	},
+	
+	menu = {
+		client = 37,
+		server = 34
 	},
 	
 	panel = {

@@ -75,7 +75,7 @@ function COMMAND:Execute(ply, arguments, arguments_string)
 	)
 	
 	for command, command_data in pairs(PYRITION.Commands) do
-		if isbool(command_data) then MsgC(command_data and color_command_mediated_executable or color_command_mediated, command, color_description, describe("pyrition.commands." .. command))
+		if isbool(command_data) then MsgC(command_data and color_command_mediated_executable or color_command_mediated, command, color_description, describe("pyrition.commands." .. command) .. "\n")
 		else
 			local command_tree = command_data.Tree or false
 			local command_tree_executable = command_tree and command_tree[1] or false
