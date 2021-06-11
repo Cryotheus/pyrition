@@ -64,7 +64,7 @@ end
 function PYRITION:PyritionConsoleExecuteCommand(ply, command_data, command, arguments, arguments_string)
 	print(ply, command_data, command, arguments, arguments_string)
 	
-	if isbool(command_data) then hook.Call("PyritionConsoleRunMediatedCommand", PYRITION, ply, argument_command, arguments, arguments_string)
+	if isbool(command_data) then hook.Call("PyritionConsoleRunMediatedCommand", PYRITION, ply, command, arguments, arguments_string)
 	else command_data:Execute(ply, arguments, arguments_string) end
 end
 

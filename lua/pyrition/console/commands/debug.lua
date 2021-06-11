@@ -1,8 +1,6 @@
 --command structure
 COMMAND.Realm = PYRITION_SHARED
 
-COMMAND.Tree = {
-	function(self, ply, arguments, arguments_string)
-
-	end
-}
+function COMMAND:Execute(ply, arguments, arguments_string)
+	print("Hello world")
+end

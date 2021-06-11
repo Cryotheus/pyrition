@@ -78,6 +78,11 @@ local config = {
 		server = 2	--0 010
 	},
 	
+	panel = {
+		menu = 5,			--0 101
+		menu_minimized = 5	--0 101
+	},
+	
 	player = {
 		discovery = 15,		--1 111
 		landing = 10,		--1 010 make this server side when done debugging
