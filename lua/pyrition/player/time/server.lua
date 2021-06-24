@@ -30,10 +30,10 @@ function PYRITION:PyritionPlayerStorageSaveTailoredTime(ply, tailored_data, path
 	tailored_data.visit = os.time()
 end
 
-function PYRITION:PyritionPlayerTimeGetSession(ply) return ply:TimeConnected() - session_start_times[ply] + session_times[ply] end
+function PYRITION:PyritionPlayerTimeGetSession(ply) return ply:TimeConnected() - session_start_times[ply] + hook.Call("PyritionPlayerTimeGetSessionPrior", self, ply) end
 
 --this is in minutes, not seconds!
-function PYRITION:PyritionPlayerTimeGetSessionPrior(ply) return session_times[ply] end
+function PYRITION:PyritionPlayerTimeGetSessionPrior(ply) return session_times[ply] or 0 end
 
 --this is in minutes, not seconds!
 function PYRITION:PyritionPlayerTimeGetTotalSessions(ply) 
@@ -68,8 +68,10 @@ hook.Add("InitPostEntity", "pyrition_player_time", function()
 end)
 
 hook.Add("PlayerDisconnected", "pyrition_player_time", function(ply)
-	--reset them AFTER we use them
+	--reset it after we let player storage save it
 	timer.Simple(0, function()
+		print("cleaned up old times for", ply)
+		
 		session_start_times[ply] = nil
 		session_times[ply] = nil
 		total_times[ply] = nil
@@ -108,7 +110,7 @@ hook.Add("PyritionPlayerInitialized", "pyrition_player_time", function(ply)
 				prior_session_count = nil
 				prior_sessions = nil
 			else prior_sessions[steam_id] = nil end
-		end
+		else session_times[ply] = 0 end
 	else session_times[ply] = 0 end
 	
 	local name = ply:Nick()
@@ -129,6 +131,7 @@ hook.Add("ShutDown", "pyrition_player_time", function()
 	local time_table = {}
 	
 	for index, ply in ipairs(player.GetHumans()) do time_table[ply:SteamID()] = math.floor(hook.Call("PyritionPlayerTimeGetSession", PYRITION, ply) / 60) end
+	
 	if table.IsEmpty(time_table) then return
 	else time_table.shutdown = true end
 	

@@ -6,14 +6,7 @@
 PYRITION = {
 	Backup = PYRITION and PYRITION.Backup or {},
 	Commands = {},
-	
-	GFX = PYRITION and PYRITION.GFX or {
-		BlipOutline = {},
-		Outline = {},
-		Halo = {}
-	},
-	
-	Pages = {},
+	Groups = {},
 	
 	Player = {
 		Storage = {}, --the keys should reflect the file's name without the extension
@@ -28,6 +21,19 @@ PYRITION = {
 	
 	Variables = {}
 }
+
+if SERVER then
+	PYRITION.SyncHooks = {}
+else
+	--maybe make a sync for this?
+	PYRITION.GFX = {
+		BlipOutline = {},
+		Outline = {},
+		Halo = {}
+	}
+	
+	PYRITION.Pages = {}
+end
 
 --realm constants
 PYRITION_CLIENT = 1 --include on client, AddCSLua
@@ -54,7 +60,9 @@ PYRITION_VARIABLE_REPLICATED = 8 --doesn't actually do anything yet
 --config
 local config = {
 	client = 37,	--100 101
+	loader = 4,		--000 100
 	server = 34,	--100 010
+	sync = 26,		--011 010
 	
 	console = {
 		chat = 21,		--10 101
@@ -74,14 +82,20 @@ local config = {
 		outline_blip = 5	--0 101
 	},
 	
+	group = {
+		client = 45,	--101 101
+		server = 42,	--101 010
+		shared = 39		--100 111
+	},
+	
 	language = {
 		client = 5,	--0 101
 		server = 2	--0 010
 	},
 	
 	menu = {
-		client = 37,
-		server = 34
+		client = 37,	--100 101
+		server = 34		--100 010
 	},
 	
 	panel = {

@@ -1,4 +1,6 @@
---locals
+--globals
+PYRITION.MediaCommands = {}
+
 --local functions
 local function execute_media(command_data, ply, arguments, arguments_string) hook.Call("PyritionConsoleRunMediatedCommand", PYRITION, ply, command_data.Command, arguments, arguments_string) end
 local function has_flag(flags, flag) return bit.band(flags, flag) == flag end
@@ -126,7 +128,7 @@ net.Receive("pyrition_console", function(length)
 			end
 		else PYRITION.Commands[command] = command_data end
 		
-		--PYRITION.MediaCommands[command] = command_data
+		PYRITION.MediaCommands[command] = command_data
 	until not net.ReadBool()
 end)
 

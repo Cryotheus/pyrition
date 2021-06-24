@@ -1,3 +1,4 @@
+--singles
 resource.AddSingleFile("resource/localization/en/pyrition.properties")
 
 resource.AddSingleFile("materials/pyrition/memes/enjoyer/contemplate.png")

@@ -10,7 +10,7 @@ local color_error = Color(64, 0, 0)
 local describe
 local description_insult
 
-if SERVER then function describe() return ": Function descriptions are not available to the server realm.\n" end
+if SERVER then function describe(ignored, no_concatenations) return no_concatenations and "Function descriptions are not available to the server realm." or ": Function descriptions are not available to the server realm.\n" end
 else
 	description_insult = language.GetPhrase("pyrition.insults.description")
 	

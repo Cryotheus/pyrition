@@ -244,7 +244,7 @@ local function draw_outlines_depth(entities, r, g, b, a, scr_w, scr_h)
 		end
 	fl_cam_End2D()
 	
-	fl_render_ClearDepth()
+	--fl_render_ClearDepth()
 	fl_render_PopFilterMag()
 	fl_render_PopFilterMin()
 	fl_render_SetStencilEnable(false)
@@ -256,7 +256,7 @@ hook.Add("PostDrawEffects", "pyrition_gfx_outline", function()
 	
 	local groups = PYRITION.GFX.Outline
 	
-	for index, data in ipairs(groups) do
+	for index, data in pairs(groups) do
 		if data.ignore_z then draw_outlines(data.entities, data.r, data.g, data.b, data.a, scr_w, scr_h)
 		else draw_outlines_depth(data.entities, data.r, data.g, data.b, data.a, scr_w, scr_h) end
 	end

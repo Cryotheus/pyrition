@@ -4,7 +4,32 @@ util.AddNetworkString("pyrition_console")
 local color_generic = Color(255, 255, 255)
 local color_significant = Color(255, 191, 0)
 local mediated_commands = {}
-local syncing_players = {}
+
+--globals
+PYRITION.SyncHooks.Console = {
+	--create a sync when a player loads in
+	Initial = {
+		Iteration = 1,
+		Key = "Console",
+		Max = 2,
+		MediatedCommands = {}
+	},
+	
+	--call the hook multiple times until it does not return true
+	--this does not send multiple net messages
+	Iterative = true,
+	
+	--merge the sync data creating a CRecipientFilter for all players targetted
+	Merge = false,
+	
+	--prefixed by pyrition_
+	NewtorkString = "console",
+	
+	--importance of this sync over others
+	--console is 10
+	--group is 20
+	Priority = 10,
+}
 
 --local functions
 local function has_flag(flags, flag) return bit.band(flags, flag) == flag end
@@ -56,49 +81,49 @@ function PYRITION:PyritionConsoleRunMediatedCommand(ply, command, arguments, arg
 	hook.Call("PyritionConsoleRunCommand", PYRITION, ply, "pyrition_media", arguments, command .. " " .. arguments_string)
 end
 
+function PYRITION:PyritionSyncHookConsole(data, first)
+	--first is true if it is the first time this hook has been called since the net message has started
+	local command = data.MediatedCommands[data.Iteration]
+	local command_data = self.Commands[command]
+	local command_tree = command_data.Tree
+	
+	if not first then net.WriteBool(true) end
+	if write_media_command(command, command_tree) then write_media_commands(command_tree) end
+	
+	--with iterative sync hooks, return true to keep going
+	return true
+end
+
+function PYRITION:PyritionSyncInitialConsole(data)
+	--find commands that they have permissions to use, and put the data.MediatedCommands table
+	--instead of this, which is temporary
+	data.MediatedCommands = mediated_commands
+	
+	--return false if you don't want to make an initial sync
+	return true
+end
+
+function PYRITION:PyritionSyncSendingConsole(data, bytes_written) net.WriteBool(false) end
+
 --commands
 concommand.Add("pyrition", function(...) hook.Call("PyritionConsoleRunCommand", PYRITION, ...) end)
 
 concommand.Add("pyrition_reload_media", function(ply, command, arguments, arguments_string)
 	if IsValid(ply) then
-		if syncing_players[ply] then ply:PrintMessage(HUD_PRINTCONSOLE, "Already performing a sync.")
-		else syncing_players[ply] = 0 end
+		local sync_data = {
+			Iteration = 1,
+			Key = "Console",
+			Max = #mediated_commands,
+			MediatedCommands = mediated_commands,
+			Target = ply
+		}
+		
+		hook.Call("PyritionSyncQueue", PYRITION, sync_data)
 	else print("I'm sorry John, you can't sync the server to itself.") end
 end)
 
 --hooks
-hook.Add("PlayerDisconnected", "pyrition_console", function(ply) syncing_players[ply] = nil end)
 hook.Add("PyritionConsoleLoadCommands", "pyrition_console", function(path) mediated_commands = {} end)
-hook.Add("PyritionPlayerInitialized", "pyrition_console", function(ply, emulated) syncing_players[ply] = 0 end)
-
-hook.Add("Think", "pyrition_console", function()
-	local commands = PYRITION.Commands
-	local mediated_amount = #mediated_commands
-	
-	for ply, commands_synced in pairs(syncing_players) do
-		local passed = false
-		
-		net.Start("pyrition_console")
-		
-		repeat
-			commands_synced = commands_synced + 1
-			
-			local command = mediated_commands[commands_synced]
-			local command_data = commands[command]
-			local command_tree = command_data.Tree
-			
-			if passed then net.WriteBool(true)
-			else passed = true end
-			
-			if write_media_command(command, command_tree) then write_media_commands(command_tree) end
-		until commands_synced >= mediated_amount or net.BytesWritten() > 100
-		
-		net.WriteBool(false)
-		net.Send(ply)
-		 
-		if commands_synced >= mediated_amount then syncing_players[ply] = nil end
-	end
-end)
 
 --net
 net.Receive("pyrition_console", function(length, ply)
