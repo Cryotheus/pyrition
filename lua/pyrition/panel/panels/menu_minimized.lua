@@ -1,5 +1,3 @@
-local PANEL = {}
-
 function PANEL:Init()
 	self.PerformLayoutFrame = vgui.GetControlTable("DFrame").PerformLayout
 	local parent = self:GetParent()
@@ -29,4 +27,4 @@ end
 function PANEL:OnRemove() if self.Menu then self.Menu:Remove() end end
 
 --post
-derma.DefineControl("PyritionMenuMinimized", "!!!INTERNAL!!! Don't touch unless you know what you're doing!", PANEL, "DFrame")
+return "PyritionMenuMinimized", "!!!INTERNAL!!! Don't touch unless you know what you're doing!", "DFrame"

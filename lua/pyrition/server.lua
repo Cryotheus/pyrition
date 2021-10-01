@@ -17,7 +17,7 @@ end)
 
 hook.Add("PlayerInitialSpawn", "pyrition", function(ply) loading_players[ply] = ply:TimeConnected() end)
 
-hook.Add("PlayerDeath", "pyrition", function(ply, inflictor, attacker)
+--[[hook.Add("PlayerDeath", "pyrition", function(ply, inflictor, attacker)
 	local id = "pyrition_special_" .. ply:EntIndex()
 	
 	hook.Add("PlayerDeathThink", id, function(ply)
@@ -25,7 +25,7 @@ hook.Add("PlayerDeath", "pyrition", function(ply, inflictor, attacker)
 		
 		hook.Remove("PlayerDeathThink", id)
 	end)
-end)
+end)]]
 
 hook.Add("Think", "pyrition", function()
 	for ply, time_spawned in pairs(loading_players) do

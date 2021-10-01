@@ -1,5 +1,3 @@
-util.AddNetworkString("pyrition_console")
-
 --locals
 local color_generic = Color(255, 255, 255)
 local color_significant = Color(255, 191, 0)
@@ -81,22 +79,23 @@ function PYRITION:PyritionConsoleRunMediatedCommand(ply, command, arguments, arg
 	hook.Call("PyritionConsoleRunCommand", PYRITION, ply, "pyrition_media", arguments, command .. " " .. arguments_string)
 end
 
-function PYRITION:PyritionSyncHookConsole(data, first)
+function PYRITION:PyritionSyncHookConsole(data, passes)
 	--first is true if it is the first time this hook has been called since the net message has started
 	local command = data.MediatedCommands[data.Iteration]
 	local command_data = self.Commands[command]
 	local command_tree = command_data.Tree
 	
-	if not first then net.WriteBool(true) end
+	if passes > 0 then net.WriteBool(true) end
 	if write_media_command(command, command_tree) then write_media_commands(command_tree) end
 	
-	--with iterative sync hooks, return true to keep going
+	--with iterative sync hooks, return true to keep going or return the new number for passes
 	return true
 end
 
 function PYRITION:PyritionSyncInitialConsole(data)
 	--find commands that they have permissions to use, and put the data.MediatedCommands table
 	--instead of this, which is temporary
+	data.Max = #mediated_commands
 	data.MediatedCommands = mediated_commands
 	
 	--return false if you don't want to make an initial sync

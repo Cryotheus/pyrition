@@ -87,7 +87,6 @@ function PYRITION:PyritionConsoleLoadCommands(path)
 	for index, file_name in ipairs(files) do
 		local command = string.StripExtension(file_name)
 		local command_error = "pyrition did not find an error"
-		local command_script
 		local command_tree = true
 		local file_path = path .. file_name
 		local valid_command
@@ -143,7 +142,7 @@ function PYRITION:PyritionConsoleRunCommand(ply, command, arguments, arguments_s
 			table.remove(arguments, 1)
 			hook.Call("PyritionConsoleExecuteCommand", self, ply, command_data, argument_command, arguments, arguments_string)
 		else print("No entry in command table found.\n") end
-	else hook.Call("PyritionLanguageMessage", self, ply, 0, "pyrition.insults.unknown_command") end
+	else hook.Call("PyritionLanguageMessage", self, ply, HUD_PRINTCONSOLE, "pyrition.insults.unknown_command") end
 end
 
 --commands

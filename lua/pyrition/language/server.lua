@@ -16,7 +16,7 @@ function PYRITION:PyritionLanguageSend(target, enumeration, key)
 end
 
 function PYRITION:PyritionLanguageSendFormat(target, enumeration, key, phrases)
-	if not phrases then
+	if istable(key) then
 		phrases = key
 		key = key.key
 	end

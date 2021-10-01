@@ -1,13 +1,18 @@
 --locals
 local absolute_path = "pyrition/"
-local current_meta_data_version = 1
+local current_meta_data_version = 2
 local player_storages = PYRITION.Player.Storage
 local pretty_print = true
 local user_path = absolute_path .. "players/"
 
+local meta_data_updates = {
+	[2] = function(ply, player_storage, meta_data, path, meta_version) meta_data.group = "guest" end
+}
+
 --pyrition functions 
 function PYRITION:PyritionPlayerStorageCreateMeta(ply, player_storage, path)
 	return {
+		group = "guest",
 		name = ply:Name(), --need to update this when they change their name
 		steam_id_64 = "S" .. ply:SteamID64(),
 		version = current_meta_version --in case we change how things are saved, we know how we're going to have to change this player's data
@@ -41,6 +46,8 @@ function PYRITION:PyritionPlayerStorageLoad(ply)
 	
 	return player_storage
 end
+
+function PYRITION:PyritionPlayerStorageLoaded(ply, player_storage) end
 
 function PYRITION:PyritionPlayerStorageLoadMeta(ply, player_storage, path)
 	local json_read = file.Read(path, "DATA")
@@ -91,6 +98,7 @@ function PYRITION:PyritionPlayerStorageSave(ply)
 end
 
 function PYRITION:PyritionPlayerStorageSaveMeta(ply, meta_data, path)
+	meta_data.group = hook.Call("PyritionGroupPlayerGet", self, ply)
 	meta_data.name = ply:Name()
 	
 	local json_data = util.TableToJSON(meta_data, pretty_print)
@@ -114,8 +122,17 @@ function PYRITION:PyritionPlayerStorageSaveTailored(ply, player_storage, path)
 	end
 end
 
-function PYRITION:PyritionPlayerStorageUpdateMeta(ply, player_storage, meta_data, path, version)
-	print("outdated meta data! (version " .. version .. " when it should be version " .. current_meta_data_version .. ")\nupdating...")
+function PYRITION:PyritionPlayerStorageUpdateMeta(ply, player_storage, meta_data, path, meta_version)
+	print("outdated meta data! (version " .. meta_version .. " when it should be version " .. current_meta_data_version .. ")\nupdating...")
+	
+	for version_index = meta_version + 1, current_meta_data_version do
+		local update_function = meta_data_updates[version_index]
+		
+		if update_function then
+			print("applying update #" .. version_index)
+			update_function(ply, player_storage, meta_data, path, meta_version)
+		end
+	end
 	
 	meta_data.version = current_meta_data_version
 end

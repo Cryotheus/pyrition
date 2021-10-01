@@ -7,6 +7,7 @@ PYRITION = {
 	Backup = PYRITION and PYRITION.Backup or {},
 	Commands = {},
 	Groups = {},
+	GroupsPrecedence = {},
 	
 	Player = {
 		Storage = {}, --the keys should reflect the file's name without the extension
@@ -60,6 +61,7 @@ PYRITION_VARIABLE_REPLICATED = 8 --doesn't actually do anything yet
 --config
 local config = {
 	client = 37,	--100 101
+	colors = 5,		--000 101
 	loader = 4,		--000 100
 	server = 34,	--100 010
 	sync = 26,		--011 010
@@ -88,6 +90,10 @@ local config = {
 		shared = 39		--100 111
 	},
 	
+	includes = {
+		digital_color = 4	--0 100
+	},
+	
 	language = {
 		client = 5,	--0 101
 		server = 2	--0 010
@@ -99,20 +105,26 @@ local config = {
 	},
 	
 	panel = {
-		menu = 5,			--0 101
-		menu_minimized = 5	--0 101
+		client = 21,		--010 101
+		scoreboard = 37,	--100 101
+		server = 18,		--010 010
+		shared = 31			--011 111
 	},
 	
 	player = {
-		discovery = 15,		--1 111
-		landing = 10,		--1 010 make this server side when done debugging
-		meta = 10,			--1 010
-		storage = 10,		--1 010
+		discovery = 15,		--001 111
+		landing = 10,		--001 010 make this server side when done debugging
+		storage = 10,		--001 010
+		
+		meta = {
+			shared = 55,	--110 111
+			server = 58		--111 010 
+		},
 		
 		time = {
-			client = 13,	--1 101
-			server = 10,	--1 010
-			shared = 7		--0 111
+			client = 13,	--001 101
+			server = 10,	--001 010
+			shared = 7		--000 111
 		}
 	},
 	

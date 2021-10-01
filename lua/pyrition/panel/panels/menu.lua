@@ -1,5 +1,3 @@
-local PANEL = {}
-
 --panel functions
 function PANEL:AttachToContextMenu()
 	self.Anchored = true
@@ -150,4 +148,4 @@ end
 function PANEL:PerformLayout(width, height) self:PerformLayoutFrame(width, height) end
 
 --post
-derma.DefineControl("PyritionMenu", "Menu for Pyrition.", PANEL, "DFrame")
+return "PyritionMenu", "Menu for Pyrition.", "DFrame"
