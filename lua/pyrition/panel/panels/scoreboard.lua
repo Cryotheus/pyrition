@@ -6,6 +6,7 @@ end
 --panel functions
 function PANEL:Init()
 	self:SetSize(ScrW(), ScrH())
+	self:SetSkin("PyritionScoreboard")
 	self:SetWorldClicker(true)
 	
 	--contents

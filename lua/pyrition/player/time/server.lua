@@ -75,6 +75,8 @@ hook.Add("PlayerDisconnected", "pyrition_player_time", function(ply)
 		session_start_times[ply] = nil
 		session_times[ply] = nil
 		total_times[ply] = nil
+		
+		print("ent index:", ply:EntIndex())
 	end)
 end)
 

@@ -6,6 +6,12 @@ local color_significant = Color(255, 191, 0)
 function PYRITION:PyritionPanelLoad(path)
 	local files, folders = file.Find(path .. "*.lua", "LUA")
 	
+	if IsValid(g_Scoreboard) then
+		g_Scoreboard:Remove()
+		
+		g_Scoreboard = nil
+	end
+	
 	for index, file_name in ipairs(files) do
 		local base_name, description, name
 		local panel = string.StripExtension(file_name)
