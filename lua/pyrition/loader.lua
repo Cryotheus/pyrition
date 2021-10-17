@@ -86,12 +86,13 @@ local config = {
 local branding = "Pyrition"
 
 --path to the folder for merging entries into the config folder
+--setting this to true is the same as setting this to "extensions"
 local loader_extension_path = true
 
---maximum amount of folders it may go down in the config tree
+--maximum amount of folders we may go down in the configuration tree
 local max_depth = 4
 
---reload command
+--set this to a string if you want a command under that name to be created for reloading the scripts 
 local reload_command = "pyrition_reload"
 
 --should the file self-include for command reloads instead of loading with the source's path as a prefix
@@ -112,6 +113,9 @@ local color_significant = Color(255, 128, 0)
 	local fl_bit_rshift = bit.rshift
 	local highest_priority = 0
 	local load_order = {}
+	
+	--don't forget to shift over priority bits if you change the amount of load functions in use
+	--make sure you go by powers of 2 as well
 	local load_functions = {
 		[1] = function(path) if CLIENT then include(path) end end,
 		[2] = function(path) if SERVER then include(path) end end,
@@ -121,11 +125,12 @@ local color_significant = Color(255, 128, 0)
 	local load_function_shift = table.Count(load_functions)
 	
 	--directory stuff
-	loader_extension_path = loader_extension_path == true and "extensions/" or loader_extension_path
+	loader_extension_path = loader_extension_path == true and "extensions/" or loader_extension_path .. "/"
 	local loader_full_source = debug.getinfo(1, "S").short_src
 	local loader_path = string.sub(loader_full_source, select(2, string.find(loader_full_source, "lua/", 1, true)) + 1)
 	local loader_directory = string.GetPathFromFilename(loader_path)
 	local map = game.GetMap()
+
 --local functions
 local function construct_order(config_table, depth, path)
 	local tabs = " ]" .. string.rep("    ", depth)
@@ -150,13 +155,23 @@ local function construct_order(config_table, depth, path)
 end
 
 local function find_extensions(file_list, root_directory, directory)
-	if file.Exists(root_directory .. directory, "LUA") then
-		local files = file.Find(root_directory .. directory .. "/*", "LUA")
+	local extended_directory = root_directory .. directory
+	local files = file.Find(extended_directory .. "/*", "LUA")
+	
+	--file.Exists is not reliable for directories on client
+	if files then
+		local added_configurations = false
 		
-		MsgC(color_generic, " Appending [" .. directory .. "] extension configurations...\n")
+		for index, file_name in ipairs(files) do
+			added_configurations = true
+			
+			table.insert(file_list, directory .. "/" .. file_name)
+		end
 		
-		for index, file_name in ipairs(files) do table.insert(file_list, directory .. "/" .. file_name) end
-	else MsgC(color_generic, "No [" .. directory .. "] extension configurations to append.\n") end
+		if added_configurations then return MsgC(color_generic, " Appended ", color_significant, directory, color_generic, " extension configurations.\n") end
+	end
+	
+	MsgC(color_generic, " No ", color_significant, directory, color_generic, " extension configurations to append.\n")
 end
 
 local function grab_extensions(extension_directory)
@@ -170,11 +185,11 @@ local function grab_extensions(extension_directory)
 		--load all those files and merge their return if its a table
 		for index, file_name in ipairs(files) do
 			local file_path = extension_directory .. file_name
-			local config_extension, remove_from_download = include(file_path)
+			local config_extension, add_for_download = include(file_path)
 			
 			if config_extension then table.Merge(config, config_extension) end
-			if remove_from_download or CLIENT then continue
-			else MsgC(color_generic, " ]    " .. file_name .. " included and added for download\n") end
+			if add_for_download and SERVER then MsgC(color_generic, " ]    SHARED	", color_significant, string.GetPathFromFilename(file_name), color_generic, string.GetFileFromFilename(file_name) .. "\n")
+			else MsgC(color_generic, CLIENT and " ]    SHARED	" or " ]    SERVER	", color_significant, string.GetPathFromFilename(file_name), color_generic, string.GetFileFromFilename(file_name) .. "\n") continue end
 			
 			AddCSLuaFile(file_path)
 		end
@@ -222,15 +237,17 @@ local function load_scripts(command_reload)
 end
 
 --concommands
-concommand.Add(reload_command, function(ply)
-	if CLIENT or not IsValid(ply) or ply:IsSuperAdmin() then
-		if self_include_reload then
-			--zero timers to prevent breaking of autoload?
-			if isstring(self_include_reload) then timer.Simple(0, function() include(self_include_reload) end)
-			else timer.Simple(0, function() include(loader_path) end) end
-		else load_scripts(true) end
-	end
-end, nil, "Reload all " .. branding .. " scripts.")
+if isstring(reload_command) then
+	concommand.Add(reload_command, function(ply)
+		if CLIENT or not IsValid(ply) or ply:IsSuperAdmin() then
+			if self_include_reload then
+				--zero timers to prevent breaking of autoload?
+				if isstring(self_include_reload) then timer.Simple(0, function() include(self_include_reload) end)
+				else timer.Simple(0, function() include(loader_path) end) end
+			else load_scripts(true) end
+		end
+	end, nil, "Reload all " .. branding .. " scripts.")
+end
 
 --post function setup
 load_scripts(false)
