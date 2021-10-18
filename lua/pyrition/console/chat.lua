@@ -58,4 +58,4 @@ function PYRITION:PyritionConsoleChatHook(ply, text, team_chat)
 end
 
 --hooks
-hook.Add("OnPlayerChat", "pyrition_console_chat", function(...) return hook.Call("PyritionConsoleChatHook", PYRITION, ...) end)
+hook.Add("OnPlayerChat", "PyritionConsoleChat", function(...) return hook.Call("PyritionConsoleChatHook", PYRITION, ...) end)

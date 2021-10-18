@@ -167,7 +167,7 @@ function PYRITION:PyritionSyncInitialGroup(data) end
 function PYRITION:PyritionSyncSendingGroup(data, bytes_written) net.WriteBool(false) end
 
 --hooks
-hook.Add("PyritionPlayerStorageLoaded", "pyrition_group", function(ply, player_storage) hook.Call("PyritionGroupPlayerSet", ply, player_storage.meta.group) end)
+hook.Add("PyritionPlayerStorageLoaded", "PyritionGroup", function(ply, player_storage) hook.Call("PyritionGroupPlayerSet", ply, player_storage.meta.group) end)
 hook.Remove("PlayerInitialSpawn", "PlayerAuthSpawn") --we're making out own, so we don't need this
 
 --post

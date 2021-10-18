@@ -138,12 +138,12 @@ function PYRITION:PyritionPlayerStorageUpdateMeta(ply, player_storage, meta_data
 end
 
 --hooks
-hook.Add("PlayerDisconnected", "pyrition_player_storage", function(ply)
+hook.Add("PlayerDisconnected", "PyritionPlayerStorage", function(ply)
 	hook.Call("PyritionPlayerStorageSave", PYRITION, ply)
 	
 	--reset them AFTER we use them
 	timer.Simple(0, function() player_storages[ply] = nil end)
 end)
 
-hook.Add("PlayerInitialSpawn", "pyrition_player_storage", function(ply) hook.Call("PyritionPlayerStorageLoad", PYRITION, ply) end)
-hook.Add("ShutDown", "pyrition_player_storage", function() for index, ply in ipairs(player.GetHumans()) do hook.Call("PyritionPlayerStorageSave", PYRITION, ply) end end)
+hook.Add("PlayerInitialSpawn", "PyritionPlayerStorage", function(ply) hook.Call("PyritionPlayerStorageLoad", PYRITION, ply) end)
+hook.Add("ShutDown", "PyritionPlayerStorage", function() for index, ply in ipairs(player.GetHumans()) do hook.Call("PyritionPlayerStorageSave", PYRITION, ply) end end)

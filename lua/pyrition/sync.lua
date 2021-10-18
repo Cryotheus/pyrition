@@ -175,7 +175,7 @@ function PYRITION:PyritionSyncThink()
 end
 
 --hooks
-hook.Add("Initialize", "pyrition_sync", function()
+hook.Add("Initialize", "PyritionSync", function()
 	MsgC(color_significant, "\nGenerating network strings...\n")
 	
 	for key, sync_info in pairs(PYRITION.SyncHooks) do
@@ -188,7 +188,7 @@ hook.Add("Initialize", "pyrition_sync", function()
 	MsgC(color_significant, "\nSync hook network strings added.\n\n")
 end)
 
-hook.Add("PyritionPlayerInitialized", "pyrition_sync", function(ply, emulated)
+hook.Add("PyritionPlayerInitialized", "PyritionSync", function(ply, emulated)
 	for key, sync_info in pairs(PYRITION.SyncHooks) do
 		local initial_sync = sync_info.Initial
 		
@@ -204,4 +204,4 @@ hook.Add("PyritionPlayerInitialized", "pyrition_sync", function(ply, emulated)
 	end
 end)
 
-hook.Add("Think", "pyrition_sync", function() if syncs_queued then hook.Call("PyritionSyncThink", PYRITION) end end)
+hook.Add("Think", "PyritionSync", function() if syncs_queued then hook.Call("PyritionSyncThink", PYRITION) end end)

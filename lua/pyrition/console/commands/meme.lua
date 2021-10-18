@@ -52,7 +52,7 @@ local function disable_meme()
 	meme_active = false
 	
 	--remove all hooks identified by "pyrition_meme"
-	for event, hooks in pairs(hook.GetTable()) do if hooks.pyrition_meme then hook.Remove(event, "pyrition_meme") end end
+	for event, hooks in pairs(hook.GetTable()) do if hooks.pyrition_meme then hook.Remove(event, "PyritionConsoleCommandsMeme") end end
 	
 	--remove all client side props 
 	for key, meme_prop in pairs(meme_props) do meme_prop:Remove() end
@@ -128,7 +128,7 @@ COMMAND.Tree = {
 					y = header_size
 				}
 				
-				hook.Add("RenderScene", "pyrition_meme", function(origin, angles, fov)
+				hook.Add("RenderScene", "PyritionConsoleCommandsMeme", function(origin, angles, fov)
 					view.angles = angles
 					view.origin = origin
 					
@@ -194,7 +194,7 @@ COMMAND.Tree = {
 		},
 		
 		stare = function(self, ply, arguments, arguments_string)
-			hook.Add("PrePlayerDraw", "pyrition_meme", function(ply)
+			hook.Add("PrePlayerDraw", "PyritionConsoleCommandsMeme", function(ply)
 				local bone_id = ply:LookupBone("ValveBiped.Bip01_Head1")
 				
 				if bone_id then

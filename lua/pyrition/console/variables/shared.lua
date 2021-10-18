@@ -159,7 +159,7 @@ function PYRITION:PyritionConsoleVariableSet(command, command_data, variable, va
 end
 
 --hooks
-hook.Add("Think", "pyrition_console_variables", function()
+hook.Add("Think", "PyritionConsoleVariables", function()
 	--more?
 	if console_variables_changes then hook.Call("PyritionConsoleVariableSave", PYRITION, console_variables_changes) end
 end)

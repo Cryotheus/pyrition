@@ -67,7 +67,7 @@ local config = {
 		
 		meta = {
 			shared = 55,	--110 111
-			server = 58		--111 010 
+			server = 58		--111 010
 		},
 		
 		time = {

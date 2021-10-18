@@ -164,7 +164,7 @@ local function draw_blip(entity, r, g, b, a, real_time, scr_w, scr_h, blip_modul
 end
 
 --hooks
-hook.Add("PostDrawEffects", "pyrition_gfx_outline_blip", function()
+hook.Add("PostDrawEffects", "PyritionGFXOutlineBlip", function()
 	local entities = PYRITION.GFX.BlipOutline
 	local real_time = RealTime()
 	local scr_w, scr_h = ScrW(), ScrH()

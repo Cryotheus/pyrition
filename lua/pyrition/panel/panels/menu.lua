@@ -145,6 +145,7 @@ function PANEL:MinimizeInContextMenu()
 	self:SetVisible(false)
 end
 
+function PANEL:OnRemove() hook.Remove("ContextMenuOpened", self) end
 function PANEL:PerformLayout(width, height) self:PerformLayoutFrame(width, height) end
 
 --post

@@ -119,11 +119,5 @@ hook.Add("ScoreboardShow", "PyritionPanelScoreboard", function()
 	return true
 end)
 
-hook.Remove("HUDPaint", "PyritionPanelScoreboard")
---[[
-hook.Add("HUDPaint", "PyritionPanelScoreboard", function()
-	draw.SimpleText(context_menu_button and tostring(context_menu_button) or ".", "DermaLarge", ScrW() * 0.5, ScrH() * 0.25, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-end) --]]
-
 --post
 if g_Scoreboard then hook.Call("PyritionPanelScoreboardCreate", PYRITION) end

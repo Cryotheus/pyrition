@@ -11,7 +11,7 @@ function PYRITION:PyritionClientInitialized(ply)
 end
 
 --hooks
-hook.Add("InitPostEntity", "pyrition", function()
+hook.Add("InitPostEntity", "Pyrition", function()
 	--
 	print("InitPostEntity ran")
 	

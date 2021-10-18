@@ -77,4 +77,4 @@ COMMAND.VariableMeta = {
 function COMMAND:VariablesInitialized(command_variables) if command_variables.halo_override then enable_halo_override(self) end end
 
 --hooks
-hook.Add("PyritionGFXOutlineHaloOverride", "pyrition_console_command_outline", function() if not halo_overriden then return true end end)
+hook.Add("PyritionGFXOutlineHaloOverride", "PyritionConsoleCommandsOutline", function() if not halo_overriden then return true end end)

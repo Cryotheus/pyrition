@@ -122,7 +122,7 @@ concommand.Add("pyrition_reload_media", function(ply, command, arguments, argume
 end)
 
 --hooks
-hook.Add("PyritionConsoleLoadCommands", "pyrition_console", function(path) mediated_commands = {} end)
+hook.Add("PyritionConsoleLoadCommands", "PyritionConsole", function(path) mediated_commands = {} end)
 
 --net
 net.Receive("pyrition_console", function(length, ply)

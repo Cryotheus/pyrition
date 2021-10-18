@@ -251,7 +251,7 @@ local function draw_outlines_depth(entities, r, g, b, a, scr_w, scr_h)
 end
 
 --hooks
-hook.Add("PostDrawEffects", "pyrition_gfx_outline", function()
+hook.Add("PostDrawEffects", "PyritionGFXOutline", function()
 	local scr_w, scr_h = ScrW(), ScrH()
 	
 	local groups = PYRITION.GFX.Outline

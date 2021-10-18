@@ -72,7 +72,7 @@ end
 
 local function toggle(state)
 	if state then
-		hook.Add("OnPlayerChat", "chat_calculator", function(ply, text, team, dead)
+		hook.Add("OnPlayerChat", "PyritionConsoleCommandsCalculator", function(ply, text, team, dead)
 			print(ply, text, team, dead)
 			
 			if string.Left(text, 1) == "=" then
@@ -94,7 +94,7 @@ local function toggle(state)
 				end
 			end
 		end)
-	else hook.Remove("OnPlayerChat", "chat_calculator") end
+	else hook.Remove("OnPlayerChat", "PyritionConsoleCommandsCalculator") end
 end
 
 --command structure

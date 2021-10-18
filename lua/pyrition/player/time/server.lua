@@ -46,7 +46,7 @@ function PYRITION:PyritionPlayerTimeGetTotalSessions(ply)
 end
 
 --hooks
-hook.Add("InitPostEntity", "pyrition_player_time", function()
+hook.Add("InitPostEntity", "PyritionPlayerTime", function()
 	local player_sessions_json = file.Read("pyrition/players/sessions.json", "DATA")
 	
 	if player_sessions_json then
@@ -67,7 +67,7 @@ hook.Add("InitPostEntity", "pyrition_player_time", function()
 	else print("No prior sessions times JSON.") end
 end)
 
-hook.Add("PlayerDisconnected", "pyrition_player_time", function(ply)
+hook.Add("PlayerDisconnected", "PyritionPlayerTime", function(ply)
 	--reset it after we let player storage save it
 	timer.Simple(0, function()
 		print("cleaned up old times for", ply)
@@ -80,7 +80,7 @@ hook.Add("PlayerDisconnected", "pyrition_player_time", function(ply)
 	end)
 end)
 
-hook.Add("PyritionPlayerInitialized", "pyrition_player_time", function(ply)
+hook.Add("PyritionPlayerInitialized", "PyritionPlayerTime", function(ply)
 	--instead of initial sync, we want a hook that gets called when the player first moves\
 	if ply:IsBot() then
 		session_start_times[ply] = 0
@@ -129,7 +129,7 @@ hook.Add("PyritionPlayerInitialized", "pyrition_player_time", function(ply)
 	player_storage.time.visit = unix_time
 end)
 
-hook.Add("ShutDown", "pyrition_player_time", function()
+hook.Add("ShutDown", "PyritionPlayerTime", function()
 	local time_table = {}
 	
 	for index, ply in ipairs(player.GetHumans()) do time_table[ply:SteamID()] = math.floor(hook.Call("PyritionPlayerTimeGetSession", PYRITION, ply) / 60) end
